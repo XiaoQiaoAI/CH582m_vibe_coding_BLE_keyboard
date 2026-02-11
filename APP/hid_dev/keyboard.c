@@ -134,21 +134,21 @@ void keyboard_init(void)
 {
     memset(&keyboard_state, 0X00, sizeof(keyboard_state));
     // if (running_data.mac_offset >= 5)
-    // {
-    //     keyboard_state.mode = SIX_KEY;
-    //     keyboard_state.kbd_is_onereport = 1;
-    //     keyboard_state.report_length = 9;
-    //     keyboard_state.report_pointer = report_map_six_key;
-    //     keyboard_state.desp_lenth = sizeof(report_map_six_key);
-    // }
-    // else
     {
-        keyboard_state.mode             = ALL_KEY;
-        keyboard_state.kbd_is_onereport = 0;
-        keyboard_state.report_length    = 18;
-        keyboard_state.report_pointer   = report_map_all;
-        keyboard_state.desp_lenth       = sizeof(report_map_all);
+        keyboard_state.mode             = SIX_KEY;
+        keyboard_state.kbd_is_onereport = 1;
+        keyboard_state.report_length    = 9;
+        keyboard_state.report_pointer   = report_map_six_key;
+        keyboard_state.desp_lenth       = sizeof(report_map_six_key);
     }
+    // else
+    // {
+    //     keyboard_state.mode             = ALL_KEY;
+    //     keyboard_state.kbd_is_onereport = 0;
+    //     keyboard_state.report_length    = 18;
+    //     keyboard_state.report_pointer   = report_map_all;
+    //     keyboard_state.desp_lenth       = sizeof(report_map_all);
+    // }
     memset(&tkeyboard_buff, 0X00, sizeof(tkeyboard_buff));
     memset(&tkeyboard_buff_last, 0X00, sizeof(tkeyboard_buff_last));
     tkeyboard_buff.report_id = 0x01;

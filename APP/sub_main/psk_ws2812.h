@@ -14,8 +14,8 @@
 
 // #define WS2812_ON  LL_GPIO_SetOutputPin(GPIOB, GPIO_Pin_4)
 // #define WS2812_OFF LL_GPIO_ResetOutputPin(GPIOB, GPIO_Pin_4)
-#define WS2812_ON
-#define WS2812_OFF
+#define WS2812_POWER_ON
+#define WS2812_POWER_OFF
 
 typedef struct rgb_t_s
 {

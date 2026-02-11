@@ -238,9 +238,9 @@ void tim5_ch3_ll_dma_init(void)
 
     // TMR2_ITCfg(ENABLE, TMR1_2_IT_DMA_END);
 
-    TMR3_TimerInit(360000);
-    TMR3_ITCfg(ENABLE, TMR0_3_IT_CYC_END);
-    PFIC_EnableIRQ(TMR3_IRQn);
+    // TMR3_TimerInit(360000 / 2);
+    // TMR3_ITCfg(ENABLE, TMR0_3_IT_CYC_END);
+    // PFIC_EnableIRQ(TMR3_IRQn);
 }
 void update_once(void)
 {
@@ -325,7 +325,7 @@ void change_2812_state(int x)
     if (ws2812_state.ws2812_power_state != x) {
         if (x == 0 || x == 1) {
             if (ws2812_state.ws2812_power_state == 2) {
-                WS2812_OFF;
+                WS2812_POWER_OFF;
                 // PRINT("L_OFF\n");
                 tim5_ch3_ll_dma_deinit();
                 TMR2_PWMDisable();
@@ -334,7 +334,7 @@ void change_2812_state(int x)
             }
         }
         if (x == 2) {
-            WS2812_ON;
+            WS2812_POWER_ON;
             TMR2_PWMEnable();
             TMR2_Enable();
             // PRINT("L_ON\n");
@@ -352,7 +352,6 @@ void change_2812_state(int x)
 __attribute__((interrupt("WCH-Interrupt-fast"))) __attribute__((section(".highcode"))) void TMR3_IRQHandler(
     void) // TMR0 ????
 {
-    static uint8_t send_ok = 1;
     if (TMR3_GetITFlag(TMR0_3_IT_CYC_END)) {
         TMR3_ClearITFlag(TMR0_3_IT_CYC_END); // ??????
         update_bit(ws2812_state.cur_led);

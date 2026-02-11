@@ -17,7 +17,7 @@ void MY_USB_HID_SEND_REPORT(uint8_t *report, uint16_t len);
 #include "usbd_customhid.h"
 #endif
 
-extern const uint8_t report_map_all[127];
+extern const uint8_t report_map_all[105];
 extern const uint8_t report_map_six_key[63];
 
 extern uint8_t rf_send_data[66];

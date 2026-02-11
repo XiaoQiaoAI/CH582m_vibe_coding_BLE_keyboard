@@ -4,7 +4,7 @@
 #include "main.h"
 static uint8_t data[64];
 
-const uint8_t report_map_all[127] = {
+const uint8_t report_map_all[105] = {
     0x05,
     0x01, // USAGE_PAGE (Generic Desktop)
     0x09,
@@ -232,29 +232,29 @@ const uint8_t report_map_all[127] = {
     // 0x81, 0x02,       //   INPUT (Data,Var,Abs)
     // 0xc0,             // END_COLLECTION
 
-    0x05,
-    0x8c, /* USAGE_PAGE (ST Page) */
-    0x09,
-    0x01, /* USAGE (Demo Kit) */
-    0xa1,
-    0x01, /* COLLECTION (Application) */
-    0x85,
-    0x07, // 6   	GLOBAL_REPORT_ID(7)
+    // 0x05,
+    // 0x8c, /* USAGE_PAGE (ST Page) */
+    // 0x09,
+    // 0x01, /* USAGE (Demo Kit) */
+    // 0xa1,
+    // 0x01, /* COLLECTION (Application) */
+    // 0x85,
+    // 0x07, // 6   	GLOBAL_REPORT_ID(7)
 
-    // The Input report
-    0x09,
-    0x03, // USAGE ID - Vendor defined
-    0x15,
-    0x00, // LOGICAL_MINIMUM (0)
-    0x26,
-    0x00,
-    0xFF, // LOGICAL_MAXIMUM (255)
-    0x75,
-    0x08, // REPORT_SIZE (8bit)
-    0x95,
-    64,   // REPORT_COUNT (64Byte)
-    0x81,
-    0x02, // INPUT (Data,Var,Abs)
+    // // The Input report
+    // 0x09,
+    // 0x03, // USAGE ID - Vendor defined
+    // 0x15,
+    // 0x00, // LOGICAL_MINIMUM (0)
+    // 0x26,
+    // 0x00,
+    // 0xFF, // LOGICAL_MAXIMUM (255)
+    // 0x75,
+    // 0x08, // REPORT_SIZE (8bit)
+    // 0x95,
+    // 64,   // REPORT_COUNT (64Byte)
+    // 0x81,
+    // 0x02, // INPUT (Data,Var,Abs)
 
     // // The Output report
     // 0x09, 0x04,                  // USAGE ID - Vendor defined
@@ -311,7 +311,7 @@ const uint8_t report_map_all[127] = {
     // 0xc0,       // END_COLLECTION
 
     // /* USER CODE END 0 */
-    0xC0 /*     END_COLLECTION	             */
+    // 0xC0 /*     END_COLLECTION	             */
 
     // 0x05, 0x01, // Usage Pg (Generic Desktop)
     // 0x09, 0x06, // Usage (Keyboard)
@@ -360,40 +360,89 @@ const uint8_t report_map_all[127] = {
 };
 // uint8_t report_map_all_size = sizeof(report_map_all);
 
+// clang-format off
 const uint8_t report_map_six_key[63] = {
-    0x05, 0x01, // USAGE_PAGE (Generic Desktop)
-    0x09, 0x06, // USAGE (Keyboard)
-    0xa1, 0x01, // COLLECTION (Application)
-    0x05, 0x07, //   USAGE_PAGE (Keyboard)
-    0x19, 0xe0, //   USAGE_MINIMUM (Keyboard LeftControl)
-    0x29, 0xe7, //   USAGE_MAXIMUM (Keyboard Right GUI)
-    0x15, 0x00, //   LOGICAL_MINIMUM (0)
-    0x25, 0x01, //   LOGICAL_MAXIMUM (1)
-    0x75, 0x01, //   REPORT_SIZE (1)
-    0x95, 0x08, //   REPORT_COUNT (8)
-    0x81, 0x02, //   INPUT (Data,Var,Abs)
-    0x95, 0x01, //   REPORT_COUNT (1)
-    0x75, 0x08, //   REPORT_SIZE (8)
-    0x81, 0x03, //   INPUT (Cnst,Var,Abs)
-    0x95, 0x05, //   REPORT_COUNT (5)
-    0x75, 0x01, //   REPORT_SIZE (1)
-    0x05, 0x08, //   USAGE_PAGE (LEDs)
-    0x19, 0x01, //   USAGE_MINIMUM (Num Lock)
-    0x29, 0x05, //   USAGE_MAXIMUM (Kana)
-    0x91, 0x02, //   OUTPUT (Data,Var,Abs)
-    0x95, 0x01, //   REPORT_COUNT (1)
-    0x75, 0x03, //   REPORT_SIZE (3)
-    0x91, 0x03, //   OUTPUT (Cnst,Var,Abs)
-    0x95, 0x06, //   REPORT_COUNT (6)
-    0x75, 0x08, //   REPORT_SIZE (8)
-    0x15, 0x00, //   LOGICAL_MINIMUM (0)
-    0x25, 0x65, //   LOGICAL_MAXIMUM (101)
-    0x05, 0x07, //   USAGE_PAGE (Keyboard)
-    0x19, 0x00, //   USAGE_MINIMUM (Reserved (no event indicated))
-    0x29, 0x65, //   USAGE_MAXIMUM (Keyboard Application)
-    0x81, 0x00, //   INPUT (Data,Ary,Abs)
-    0xc0        // END_COLLECTION
+    // 0x05, 0x01, // USAGE_PAGE (Generic Desktop)
+    // 0x09, 0x06, // USAGE (Keyboard)
+    // 0xa1, 0x01, // COLLECTION (Application)
+    // 0x05, 0x07, //   USAGE_PAGE (Keyboard)
+    // 0x19, 0xe0, //   USAGE_MINIMUM (Keyboard LeftControl)
+    // 0x29, 0xe7, //   USAGE_MAXIMUM (Keyboard Right GUI)
+    // 0x15, 0x00, //   LOGICAL_MINIMUM (0)
+    // 0x25, 0x01, //   LOGICAL_MAXIMUM (1)
+    // 0x75, 0x01, //   REPORT_SIZE (1)
+    // 0x95, 0x08, //   REPORT_COUNT (8)
+    // 0x81, 0x02, //   INPUT (Data,Var,Abs)
+    // 0x95, 0x01, //   REPORT_COUNT (1)
+    // 0x75, 0x08, //   REPORT_SIZE (8)
+    // 0x81, 0x03, //   INPUT (Cnst,Var,Abs)
+    // 0x95, 0x05, //   REPORT_COUNT (5)
+    // 0x75, 0x01, //   REPORT_SIZE (1)
+    // 0x05, 0x08, //   USAGE_PAGE (LEDs)
+    // 0x19, 0x01, //   USAGE_MINIMUM (Num Lock)
+    // 0x29, 0x05, //   USAGE_MAXIMUM (Kana)
+    // 0x91, 0x02, //   OUTPUT (Data,Var,Abs)
+    // 0x95, 0x01, //   REPORT_COUNT (1)
+    // 0x75, 0x03, //   REPORT_SIZE (3)
+    // 0x91, 0x03, //   OUTPUT (Cnst,Var,Abs)
+    // 0x95, 0x06, //   REPORT_COUNT (6)
+    // 0x75, 0x08, //   REPORT_SIZE (8)
+    // 0x15, 0x00, //   LOGICAL_MINIMUM (0)
+    // 0x25, 0x65, //   LOGICAL_MAXIMUM (101)
+    // 0x05, 0x07, //   USAGE_PAGE (Keyboard)
+    // 0x19, 0x00, //   USAGE_MINIMUM (Reserved (no event indicated))
+    // 0x29, 0x65, //   USAGE_MAXIMUM (Keyboard Application)
+    // 0x81, 0x00, //   INPUT (Data,Ary,Abs)
+    // 0xc0        // END_COLLECTION
+
+    0x05, 0x01, // Usage Pg (Generic Desktop)
+    0x09, 0x06, // Usage (Keyboard)
+    0xA1, 0x01, // Collection: (Application)
+                //
+    0x05, 0x07, // Usage Pg (Key Codes)
+    0x19, 0xE0, // Usage Min (224)
+    0x29, 0xE7, // Usage Max (231)
+    0x15, 0x00, // Log Min (0)
+    0x25, 0x01, // Log Max (1)
+                //
+                // Modifier byte
+    0x75, 0x01, // Report Size (1)
+    0x95, 0x08, // Report Count (8)
+    0x81, 0x02, // Input: (Data, Variable, Absolute)
+                //
+                // Reserved byte
+    0x95, 0x01, // Report Count (1)
+    0x75, 0x08, // Report Size (8)
+    0x81, 0x01, // Input: (Constant)
+                //
+                // LED report
+    0x95, 0x05, // Report Count (5)
+    0x75, 0x01, // Report Size (1)
+    0x05, 0x08, // Usage Pg (LEDs)
+    0x19, 0x01, // Usage Min (1)
+    0x29, 0x05, // Usage Max (5)
+    0x91, 0x02, // Output: (Data, Variable, Absolute)
+                //
+                // LED report padding
+    0x95, 0x01, // Report Count (1)
+    0x75, 0x03, // Report Size (3)
+    0x91, 0x01, // Output: (Constant)
+                //
+                // Key arrays (6 bytes)
+    0x95, 0x06, // Report Count (6)
+    0x75, 0x08, // Report Size (8)
+    0x15, 0x00, // Log Min (0)
+    0x25, 0x65, // Log Max (101)
+    0x05, 0x07, // Usage Pg (Key Codes)
+    0x19, 0x00, // Usage Min (0)
+    0x29, 0x65, // Usage Max (101)
+    0x81, 0x00, // Input: (Data, Array)
+                //
+    0xC0        // End Collection
+
 };
+// clang-format on
+
 // uint8_t report_size = sizeof(report_map_all);
 
 /**
@@ -409,7 +458,6 @@ void hid_rx_iqr(uint8_t rx_data[64])
         memcpy(data, rx_data, 64);
     }
 }
-uint8_t rf_send_data[66];
 
 void MY_USB_HID_SEND_REPORT(uint8_t *report, uint16_t len)
 {
@@ -423,15 +471,16 @@ void MY_USB_HID_SEND_REPORT(uint8_t *report, uint16_t len)
     }
     // if (running_data.bt_connect_stat == 2)
     {
-        if (running_data.usb_is_connected == 0) {
+        // if (running_data.usb_is_connected == 0) {
+        if (1) {
             if (running_data.bt_connect_stat == 2) {
                 // PRINT("BLE\n");
                 HidDev_Report(HID_RPT_ID_KEY_IN, HID_REPORT_TYPE_INPUT, len, report);
             } else {
-//                rf_send_data[0] = 0x01;
-//                rf_send_data[1] = len & 0x00ff;
+                //                rf_send_data[0] = 0x01;
+                //                rf_send_data[1] = len & 0x00ff;
                 // PRINT("len %d\n", len);
-//                tmos_memcpy(rf_send_data + 2, report, len);
+                //                tmos_memcpy(rf_send_data + 2, report, len);
                 // for (int i = 0; i < len + 2; i++)xzz
                 // 	PRINT("%02x ", rf_send_data[i]);
                 // PRINT("\n");
@@ -440,7 +489,7 @@ void MY_USB_HID_SEND_REPORT(uint8_t *report, uint16_t len)
                 // RF_Tx(rf_send_data, 20, 0xFF, 0xFF);
             }
         } else {
-            // PRINT("21\n");
+            PRINT("21\n");
             // if (*report == 0x01)
             // u2dev_update_report(report + 1, len - 1);
             // PRINT("USB\n");

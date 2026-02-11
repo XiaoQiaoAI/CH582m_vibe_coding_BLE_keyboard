@@ -1,11 +1,11 @@
 #include "main.h"
 
-const uint8_t usb_name[] = {0x42, 0x30, 0x63, 0x30, 0x64, 0x30, 0x44, 0x30, 0x26, 0x20, 0x0D, 0x00, 0x0A,
-                            0x00, 0x91, 0x66, 0x4F, 0x30, 0x66, 0x30, 0x72, 0x5E, 0x4B, 0x30, 0x89, 0x30,
-                            0x73, 0x30, 0x5D, 0x30, 0x46, 0x30, 0x26, 0x20, 0x0D, 0x00, 0x0A, 0x00, 0xD5,
-                            0x52, 0x44, 0x30, 0x66, 0x30, 0x6A, 0x30, 0x44, 0x30, 0x6E, 0x30, 0x6B, 0x30,
-                            0x91, 0x66, 0x44, 0x30, 0x88, 0x30, 0x5E, 0xFF, 0x26, 0x20};
-
+// const uint8_t  usb_name[]   = {0x42, 0x30, 0x63, 0x30, 0x64, 0x30, 0x44, 0x30, 0x26, 0x20, 0x0D, 0x00, 0x0A,
+//                                0x00, 0x91, 0x66, 0x4F, 0x30, 0x66, 0x30, 0x72, 0x5E, 0x4B, 0x30, 0x89, 0x30,
+//                                0x73, 0x30, 0x5D, 0x30, 0x46, 0x30, 0x26, 0x20, 0x0D, 0x00, 0x0A, 0x00, 0xD5,
+//                                0x52, 0x44, 0x30, 0x66, 0x30, 0x6A, 0x30, 0x44, 0x30, 0x6E, 0x30, 0x6B, 0x30,
+//                                0x91, 0x66, 0x44, 0x30, 0x88, 0x30, 0x5E, 0xFF, 0x26, 0x20};
+const uint8_t  usb_name[]   = {0x4B, 0x6D, 0xD5, 0x8B};
 tmosTaskID     mTaskID      = INVALID_TASK_ID;
 data_in_fram_s data_in_fram = {0};
 running_data_s running_data;
@@ -18,7 +18,7 @@ void sub_main_1(void)
     //  --------------------------------------------------------------------
     // ps("\nR8_RESET_STATUS 0x%02X\n", R8_RESET_STATUS);
 
-    // if ((R8_RESET_STATUS & RB_RESET_FLAG) == RST_FLAG_RPOR) // ÉÏµç¸´Î», ¹Ø»ú
+    // if ((R8_RESET_STATUS & RB_RESET_FLAG) == RST_FLAG_RPOR) // ï¿½Ïµç¸´Î», ï¿½Ø»ï¿½
     // {
     //     ps("\nRST_FLAG_RPOR, POWER OFF");
 
@@ -58,13 +58,13 @@ void sub_main_1(void)
     // ! BACK_LIGHT
     // --------------------------------------------------------------------
     GPIOPinRemap(DISABLE, RB_PIN_TMR0);
-    GPIOA_ResetBits(GPIO_Pin_9); // ÅäÖÃPWM¿Ú
+    GPIOA_ResetBits(GPIO_Pin_9); // ï¿½ï¿½ï¿½ï¿½PWMï¿½ï¿½
     GPIOA_ModeCfg(GPIO_Pin_9, GPIO_ModeOut_PP_5mA);
     TMR0_PWMInit(High_Level, PWM_Times_1);
-    TMR0_PWMCycleCfg(PWMCycleCfg); // ÖÜÆÚ 100us
+    TMR0_PWMCycleCfg(PWMCycleCfg); // ï¿½ï¿½ï¿½ï¿½ 100us
 
     TMR0_Disable();
-    TMR0_PWMActDataWidth(PWMCycleCfg - 1); // ÐÞ¸ÄÕ¼¿Õ±È±ØÐëÔÝÊ±¹Ø±Õ¶¨Ê±Æ÷
+    TMR0_PWMActDataWidth(PWMCycleCfg - 1); // ï¿½Þ¸ï¿½Õ¼ï¿½Õ±È±ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ø±Õ¶ï¿½Ê±ï¿½ï¿½
     TMR0_Enable();
     TMR0_PWMEnable();
     led_set_mode(0, SMOOTH_ALL, 0);
@@ -133,16 +133,18 @@ void sub_main(void)
     // ! tim5_ch3_ll_dma_init  --------------------------------------------------------------------
     // ws2812_power_pin
     // GPIO_SINGLE_INIT(GPIOB, NO_PIN, GPIO_ModeOut_PP_5mA);
-    WS2812_OFF;
+    WS2812_POWER_OFF;
     GPIOAGPPCfg(DISABLE, RB_PIN_XT32K_IE);
     tim5_ch3_ll_dma_init();
+    change_2812_state(2);
     tmos_start_task(mTaskID, MCT_WS2812_MODE, 100);
 }
 tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
 {
     uint8_t *msgPtr;
     char     txt[18];
-    if (events & SYS_EVENT_MSG) { // ´¦ÀíHAL²ãÏûÏ¢£¬µ÷ÓÃtmos_msg_receive¶ÁÈ¡ÏûÏ¢£¬´¦ÀíÍê³ÉºóÉ¾³ýÏûÏ¢¡£
+    if (events
+        & SYS_EVENT_MSG) { // ï¿½ï¿½ï¿½ï¿½HALï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tmos_msg_receiveï¿½ï¿½È¡ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Éºï¿½É¾ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿?
         msgPtr = tmos_msg_receive(task_id);
         if (msgPtr) {
             /* De-allocate */
@@ -213,7 +215,7 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
             // case 4:
             //     break;
         }
-        // tmos_start_task(mTaskID, MCT_event_update, 3);
+        tmos_start_task(mTaskID, MCT_event_update, 3);
         return events ^ MCT_event_update;
     }
     if (events & MCT_adc_measure) {
@@ -286,8 +288,156 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
         return events ^ MCT_POWER_OFF_buzz;
     }
     if (events & MCT_WS2812_MODE) {
-        tmos_start_task(mTaskID, MCT_WS2812_MODE, MS1_TO_SYSTEM_TIME(5));
-        ws2812_list[0].rgb.red += 1;
+        tmos_start_task(mTaskID, MCT_WS2812_MODE, MS1_TO_SYSTEM_TIME(50));
+
+        static uint8_t led_position = 0;
+        static int8_t  direction    = 1; // 1 = forward, -1 = backward
+
+        switch (running_data.ws2812_mode) {
+        case WS2812_OFF:
+            // Turn off all LEDs
+            for (int i = 0; i < LED_NUM; i++) {
+                ws2812_list[i].hex = 0;
+            }
+            break;
+
+        case WS2812_SINGLE_MOVE:
+            // Clear all LEDs first
+            for (int i = 0; i < LED_NUM; i++) {
+                ws2812_list[i].hex = 0;
+            }
+
+// Set main LED at full brightness
+#define COLOR_HEX 0xff3333
+            ws2812_list[led_position].hex       = COLOR_HEX;
+            ws2812_list[led_position].rgb.alpha = 255;
+
+            // Set adjacent LEDs at 60% brightness
+            if (led_position > 0) {
+                ws2812_list[led_position - 1].hex       = COLOR_HEX;
+                ws2812_list[led_position - 1].rgb.alpha = 100; // 60% of 255
+            }
+            if (led_position < LED_NUM - 1) {
+                ws2812_list[led_position + 1].hex       = COLOR_HEX;
+                ws2812_list[led_position + 1].rgb.alpha = 100; // 60% of 255
+            }
+
+            // Set LEDs 2 positions away at 30% brightness
+            if (led_position > 1) {
+                ws2812_list[led_position - 2].hex       = COLOR_HEX;
+                ws2812_list[led_position - 2].rgb.alpha = 30; // 30% of 255
+            }
+            if (led_position < LED_NUM - 2) {
+                ws2812_list[led_position + 2].hex       = COLOR_HEX;
+                ws2812_list[led_position + 2].rgb.alpha = 30; // 30% of 255
+            }
+
+            // Update position for next iteration
+            led_position += direction;
+
+            // Bounce back when reaching the end
+            if (led_position >= LED_NUM - 1) {
+                led_position = LED_NUM - 1;
+                direction    = -1;
+            } else if (led_position <= 0) {
+                led_position = 0;
+                direction    = 1;
+            }
+            break;
+
+        case WS2812_RAINBOW_WAVE: {
+            static uint8_t hue_offset = 0;
+
+            // Create rainbow wave across all LEDs
+            for (int i = 0; i < LED_NUM; i++) {
+                // Calculate hue for this LED (0-255 range)
+                // Spread rainbow across LEDs and add time-based offset for animation
+                uint8_t hue = (i * 256 / LED_NUM + hue_offset) & 0xFF;
+
+                // Simple HSV to RGB conversion (S=255, V=255)
+                uint8_t region    = hue / 43; // 0-5
+                uint8_t remainder = (hue - (region * 43)) * 6;
+
+                uint8_t r = 0, g = 0, b = 0;
+
+                switch (region) {
+                case 0:
+                    r = 255;
+                    g = remainder;
+                    b = 0;
+                    break;
+                case 1:
+                    r = 255 - remainder;
+                    g = 255;
+                    b = 0;
+                    break;
+                case 2:
+                    r = 0;
+                    g = 255;
+                    b = remainder;
+                    break;
+                case 3:
+                    r = 0;
+                    g = 255 - remainder;
+                    b = 255;
+                    break;
+                case 4:
+                    r = remainder;
+                    g = 0;
+                    b = 255;
+                    break;
+                default:
+                    r = 255;
+                    g = 0;
+                    b = 255 - remainder;
+                    break;
+                }
+
+                ws2812_list[i].rgb.red   = r;
+                ws2812_list[i].rgb.green = g;
+                ws2812_list[i].rgb.blue  = b;
+                ws2812_list[i].rgb.alpha = 255; // Slightly dimmed for smoother look
+            }
+
+            // Advance the wave animation
+            hue_offset -= 10;
+        } break;
+
+        case WS2812_BREATHING: {
+            static uint8_t brightness = 0;
+            static int8_t  fade_dir   = 1; // 1 = fade in, -1 = fade out
+
+// Define breathing color (soft blue)
+#define BREATH_COLOR_R 50
+#define BREATH_COLOR_G 100
+#define BREATH_COLOR_B 255
+
+            // Set all LEDs to the same color with current brightness
+            for (int i = 0; i < LED_NUM; i++) {
+                ws2812_list[i].rgb.red   = BREATH_COLOR_R;
+                ws2812_list[i].rgb.green = BREATH_COLOR_G;
+                ws2812_list[i].rgb.blue  = BREATH_COLOR_B;
+                ws2812_list[i].rgb.alpha = brightness;
+            }
+
+            // Update brightness for breathing effect
+            brightness += fade_dir * 8;
+
+            // Reverse direction at min/max brightness
+            if (brightness >= 250) {
+                brightness = 250;
+                fade_dir   = -1;
+            } else if (brightness <= 50) {
+                brightness = 50;
+                fade_dir   = 1;
+            }
+        } break;
+
+        default:
+            break;
+        }
+        for (int i = 0; i < LED_NUM; i++)
+            update_bit(i);
         return events ^ MCT_WS2812_MODE;
     }
     return 0;

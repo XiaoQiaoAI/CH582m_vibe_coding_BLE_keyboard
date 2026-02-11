@@ -48,6 +48,8 @@ enum music_flag {
 enum ws2812_mode_e {
     WS2812_OFF = 0x0, // all led black (off)
     WS2812_SINGLE_MOVE,
+    WS2812_RAINBOW_WAVE,
+    WS2812_BREATHING,
 
 };
 typedef struct
