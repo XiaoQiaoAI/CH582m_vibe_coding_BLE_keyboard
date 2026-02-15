@@ -12,14 +12,17 @@
 enum ws2812_mode_e {
     WS2812_OFF = 0x0, // all led black (off)
     WS2812_SINGLE_MOVE,
+    WS2812_RAINBOW_MOVE,
     WS2812_RAINBOW_WAVE,
+    WS2812_RAINBOW_WAVE_SLOW,
     WS2812_BREATHING,
+    WS2812_MIDDLE_LIGHT,
 
 };
 
 #define ONE_PULSE   (49)  // 1 码计数个数 //90/59
 #define ZERO_PULSE  (17)  // 0 码计数个数 //90/20
-#define RESET_PULSE (220) // 80 复位电平个数（不能低于40）
+#define RESET_PULSE (250) // 80 复位电平个数（不能低于40）
 
 // #define WS2812_ON  LL_GPIO_SetOutputPin(GPIOB, GPIO_Pin_4)
 // #define WS2812_OFF LL_GPIO_ResetOutputPin(GPIOB, GPIO_Pin_4)

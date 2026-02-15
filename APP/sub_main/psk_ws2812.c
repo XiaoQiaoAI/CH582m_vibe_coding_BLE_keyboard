@@ -1,5 +1,6 @@
 #include "psk_ws2812.h"
 // #include "tim.h"
+#include "psk_ps.h"
 #include "string.h"
 
 __attribute__((aligned(4))) size_tmp ws2812_bittmp_all[24 * LED_NUM + RESET_PULSE] = {0};
@@ -426,7 +427,9 @@ void ws2812_display(enum ws2812_mode_e mode, uint32_t COLOR_HEX)
         }
         break;
 
-    case WS2812_RAINBOW_WAVE: {
+    case WS2812_RAINBOW_WAVE:
+    case WS2812_RAINBOW_WAVE_SLOW:
+    case WS2812_RAINBOW_MOVE: {
         static uint8_t hue_offset = 0;
 
         // Create rainbow wave across all LEDs
@@ -481,7 +484,42 @@ void ws2812_display(enum ws2812_mode_e mode, uint32_t COLOR_HEX)
         }
 
         // Advance the wave animation
-        hue_offset -= 10;
+        if (mode == WS2812_RAINBOW_WAVE_SLOW)
+            hue_offset -= 2;
+        else
+            hue_offset -= 10;
+        if (mode == WS2812_RAINBOW_MOVE) {
+            for (int i = 0; i < LED_NUM; i++)
+                ws2812_list[i].rgb.alpha = 1;
+            ws2812_list[led_position].rgb.alpha = 255;
+
+            if (led_position > 0) {
+                ws2812_list[led_position - 1].rgb.alpha = 100; // 60% of 255
+            }
+            if (led_position < LED_NUM - 1) {
+                ws2812_list[led_position + 1].rgb.alpha = 100; // 60% of 255
+            }
+
+            // Set LEDs 2 positions away at 30% brightness
+            if (led_position > 1) {
+                ws2812_list[led_position - 2].rgb.alpha = 30; // 30% of 255
+            }
+            if (led_position < LED_NUM - 2) {
+                ws2812_list[led_position + 2].rgb.alpha = 30; // 30% of 255
+            }
+
+            // Update position for next iteration
+            led_position += direction;
+
+            // Bounce back when reaching the end
+            if (led_position >= LED_NUM - 1) {
+                led_position = LED_NUM - 1;
+                direction    = -1;
+            } else if (led_position <= 0) {
+                led_position = 0;
+                direction    = 1;
+            }
+        }
     } break;
 
     case WS2812_BREATHING: {
@@ -508,6 +546,16 @@ void ws2812_display(enum ws2812_mode_e mode, uint32_t COLOR_HEX)
             brightness = 50;
             fade_dir   = 1;
         }
+    } break;
+    case WS2812_MIDDLE_LIGHT: {
+        const uint8_t light[4] = {1, 30, 130, 255};
+        for (int i = 0; i < LED_NUM / 2; i++) {
+            ws2812_list[i].hex                     = COLOR_HEX;
+            ws2812_list[i].rgb.alpha               = light[i];
+            ws2812_list[LED_NUM - 1 - i].hex       = COLOR_HEX;
+            ws2812_list[LED_NUM - 1 - i].rgb.alpha = light[i];
+        }
+
     } break;
 
     default:
