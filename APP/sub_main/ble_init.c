@@ -74,6 +74,14 @@ static uint8_t exter_advertData[] = {
     GAP_ADTYPE_APPEARANCE,
     LO_UINT16(APPEARANCE),
     HI_UINT16(APPEARANCE),
+
+    0x06,
+    GAP_ADTYPE_MANUFACTURER_SPECIFIC,
+    0x06,
+    0x00,
+    0x03,
+    0x00,
+    0x80,
 };
 
 extern uint8_t attDeviceName[GAP_DEVICE_NAME_LEN];
@@ -81,8 +89,8 @@ uint8_t        scanRspData__[MAX_SCAN_RES_LEN];
 uint16_t       scanRspData__len;
 uint8_t        advertData__[MAX_SCAN_RES_LEN];
 uint16_t       advertData__len;
-#define NAME_IN_ADV
-// #define NAME_IN_SCAN
+// #define NAME_IN_ADV
+#define NAME_IN_SCAN
 extern uint32_t g_LLE_IRQLibHandlerLocation;
 void            PSK_WCHBLE_Init(void)
 {
