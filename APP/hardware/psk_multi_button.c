@@ -53,7 +53,7 @@ void set_mode(uint8_t mode)
     if (mode < 3)
         for (int i = 0; i < 4; i++) {
             if (key_bund.user_key_desc[mode][i][0])
-                IPS_ShowString(8, 16 + i * 16, key_bund.user_key_desc[mode][i], RED);
+                IPS_ShowString_len(8, 16 + i * 16, key_bund.user_key_desc[mode][i], RED, 20);
             else
                 IPS_ShowString(0, 16 + i * 16, "N/A", BLUE);
         }
@@ -118,8 +118,8 @@ void key44callback(void *button)
     btn_event_val         = get_button_event((struct Button *) button);
     index                 = ((struct Button *) button)->func_para;
     // PRINT("%d , %d\n", index, btn_event_val);
-    if (btn_event_val == PRESS_DOWN)
-        running_data.ws2812_mode = index;
+    // if (running_data.mode_data == 3 && btn_event_val == PRESS_DOWN)
+    //     running_data.ws2812_mode = index;
     if (running_data.edit_flag == 1) {
         running_data.have_edit = 1;
         if (btn_event_val == PRESS_DOWN) {
