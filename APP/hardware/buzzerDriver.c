@@ -35,10 +35,12 @@ void buzzerDriverInit(void)
     TMR1_Enable();
 }
 
-const uint32_t bibi__Melody1[] = {NOTE_D6, 0, NOTE_D6, 0};
-const uint32_t bibiDuration1[] = {1, 1, 1, 1};
-const uint32_t disc__Melody1[] = {NOTE_D6, NOTE_D4, 0};
-const uint32_t discDuration1[] = {1, 6, 1};
+const uint32_t bibi__Melody1[]  = {NOTE_D6, 0, NOTE_D6, 0};
+const uint32_t bibiDuration1[]  = {1, 1, 1, 1};
+const uint32_t disc__Melody1[]  = {NOTE_D6, NOTE_D4, 0};
+const uint32_t discDuration1[]  = {1, 6, 1};
+const uint32_t p_off__Melody1[] = {NOTE_A6, 0};
+const uint32_t p_offDuration1[] = {100, 1};
 
 void start_music(int x)
 {
@@ -56,7 +58,14 @@ void start_music(int x)
         music_state.note_sum   = ARRAY_SIZE(disc__Melody1);
         music_state.note_curr  = 0;
         music_state.music_play = MUS_cus;
-    } else if (x == 2) {
+    } else if (x == 3) {
+        music_state.music_play = MUS_STOP;
+        music_state.notes      = p_off__Melody1;
+        music_state.durat      = p_offDuration1;
+        music_state.note_sum   = ARRAY_SIZE(p_off__Melody1);
+        music_state.note_curr  = 0;
+        music_state.music_play = MUS_cus;
+    } else if (x == 4) {
         music_state.music_play = MUS_STOP;
         // music_state.music_play = MUS_3;
     }
