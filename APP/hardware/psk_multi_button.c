@@ -38,39 +38,26 @@ void shutdown(void)
 }
 void set_mode(uint8_t mode)
 {
+    __LimitValue(mode, 0, 4);
     running_data.mode_data = mode;
-    // IPS_Clear(CYAN);
-    switch (mode) {
-    case 0:
-        IPS_ShowString(16, 16, "1 click  ESC", RED);
-        IPS_ShowString(16, 32, "         z  ", RED);
-        IPS_ShowString(16, 48, "         x  ", RED);
-        IPS_ShowString(16, 64, "vol  - '+' +", RED);
-        break;
-    case 1:
-        // IPS_ShowString(16, 16, "Shft + F1   ", RED);
-        // IPS_ShowString(16, 32, "long 2 click", RED);
-        // IPS_ShowString(16, 48, "ESC   !     ", RED);
-        // IPS_ShowString(16, 64, "vol  - p/s +", RED);
-        IPS_ShowString_len(16, 16, data_in_fram.user_key_desc[0], RED, 12);
-        IPS_ShowString_len(16, 32, data_in_fram.user_key_desc[1], RED, 12);
-        IPS_ShowString_len(16, 48, data_in_fram.user_key_desc[2], RED, 12);
-        IPS_ShowString_len(16, 64, data_in_fram.user_key_desc[3], RED, 12);
-        break;
-    case 2:
-        IPS_ShowString(16, 16, "Ctrl + s    ", RED);
-        IPS_ShowString(16, 32, "Ctrl + c    ", RED);
-        IPS_ShowString(16, 48, "Ctrl + v    ", RED);
-        IPS_ShowString(16, 64, "   <- ESC ->", RED);
-        break;
-    case 3:
-        IPS_ShowString(16, 16, "pause  space", RED);
-        IPS_ShowString(16, 32, "vol - mute +", RED);
-        IPS_ShowString(16, 48, "  a -time+ s", RED);
-        IPS_ShowString(16, 64, "nor    x z c", RED);
-
-        break;
+    LCD_CS_RESET;
+    IPS_Clear(CYAN);
+    char txt[15];
+    sprintf(txt, "%1d.%02dV %d%%", running_data.v_bat / 100, running_data.v_bat % 100, running_data.power_persent);
+    IPS_ShowString(8, 0, txt, MAGENTA);
+    for (int i = 0; i < LED_NUM; i++) {
+        ws2812_list[i].hex = 0;
     }
+    ws2812_list[mode * 2].hex     = 0xFF2464ff;
+    ws2812_list[mode * 2 + 1].hex = 0xFF2464ff;
+    if (mode < 3)
+        for (int i = 0; i < 4; i++) {
+            if (key_bund.user_key_desc[mode][i][0])
+                IPS_ShowString(8, 16 + i * 16, key_bund.user_key_desc[mode][i], RED);
+            else
+                IPS_ShowString(0, 16 + i * 16, "N/A", BLUE);
+        }
+    LCD_CS_SET;
 }
 void key_scan(void)
 {
@@ -106,38 +93,16 @@ void prase_user_key(uint8_t *data, uint8_t len, uint8_t if_press)
             keyboard_press_key_code_1(data[2 + i], if_press);
         }
     } else if (data[0] == 0x74) {
-        // PRINT("ASFKHJ\n");
         if (if_press) {
             kbd_write_command_list(data + 2, min(data[1], len));
         }
     }
 }
-void user_defined_mode(uint8_t key_index, uint8_t if_press)
+void user_defined_mode(uint8_t key_index, uint8_t if_press, uint8_t mode)
 {
-    prase_user_key(data_in_fram.user_key_bind[key_index], 50, if_press);
-    // prase_user_key(key_comm_898, 20, if_press);
-    // switch (key_index)
-    // {
-    // case 0:
-    // 	keyboard_press_sp_key_1(LEFT_SHIFT, if_press);
-    // 	keyboard_press_key_code_1(Keyboard_F1_112____4_101_104, if_press);
-    // 	break;
-    // case 1:
-    // 	// mouse_set_continue_click(KEY_LEFT, if_press);
-
-    // 	kbd_write_command_list(key_comm, sizeof(key_comm));
-
-    // 	// touch_set_continue_function(if _press);
-    // 	break;
-    // case 2:
-    // 	// keyboard_press_sp_key_1(LEFT_SHIFT, if_press);
-    // 	keyboard_press_key_code_1(Keyboard_ESCAPE, if_press);
-    // 	break;
-    // case 3:
-    // 	// custom_press_key_1(MUTE, if_press);
-    // 	custom_press_key(PAUSE_PLAY, if_press);
-    // 	break;
-    // }
+    __LimitValue(mode, 0, 2);
+    __LimitValue(key_index, 0, 3);
+    prase_user_key(key_bund.user_key_bind[mode][key_index], sizeof(key_bund.user_key_bind[mode][key_index]), if_press);
 }
 /**
  *
@@ -152,185 +117,38 @@ void key44callback(void *button)
     static uint32_t count = 0;
     btn_event_val         = get_button_event((struct Button *) button);
     index                 = ((struct Button *) button)->func_para;
-    PRINT("%d , %d\n", index, btn_event_val);
-    return;
-
-    if (btn_event_val == PRESS_DOWN) {
-        data_in_fram.key_count[index]++;
-    }
-    if (running_data.bt_connect_stat == 2) {
-        running_data.power_off_timeout = 60 * 60;
-    }
-    if (index == 4) // 按下开始设置
-    {
-        // led_set_bk(80);
-        tmos_stop_task(mTaskID, MCT_light_reset);
-        tmos_start_task(mTaskID, MCT_light_reset, MS1_TO_SYSTEM_TIME(22 * 100));
-
-        switch (btn_event_val) {
-        case PRESS_DOWN:
-            ps("Nor:\n");
-            for (int i = 0; i < 4; i++) {
-                ps("%d ", data_in_fram.key_count[i]);
-            }
-            ps("\nSp:");
-            for (int i = 4; i < 5; i++) {
-                ps("%d ", data_in_fram.key_count[i]);
-            }
-            ps("\nEnc:");
-            for (int i = 5; i < 7; i++) {
-                ps("%d ", data_in_fram.key_count[i]);
-            }
-            ps("\n");
-
-            running_data.edit_flag = 1;
-            break;
-        case PRESS_UP:
-            if (running_data.edit_flag == 2 && running_data.tmp_mac < 3) {
-                if (running_data.tmp_mac != running_data.mac_offset) {
-                    running_data.mac_offset = running_data.tmp_mac;
-                    power_reset(0x80 | (running_data.mode_data & 0x0f));
-
-                    while (1)
-                        ;
-                }
-            }
-            running_data.edit_flag = 0x0;
-            // PRINT("edit_flag: %d\n",running_data.edit_flag);
-
-            // running_data.is_setting_mac = 0;
-            break;
-        }
-    } else if (running_data.edit_flag == 2) {
-        // led_set_bk(80);
-        tmos_stop_task(mTaskID, MCT_light_reset);
-        tmos_start_task(mTaskID, MCT_light_reset, MS1_TO_SYSTEM_TIME(22 * 100));
-
-        switch (btn_event_val) {
-        case PRESS_DOWN:
-            running_data.tmp_mac = index;
-            PRINT("INDEX=%d\n", index);
-        }
-        if (num_of_keys() >= 3) {
-            running_data.tmp_mac = 0xff;
-        }
-        if (num_of_keys() >= 4) {
-            POWER_OFF;
-            running_data.tmp_mac = 0xff;
-        }
-    }
-
-    else if (running_data.edit_flag == 1) {
-        // led_set_bk(80);
-        tmos_stop_task(mTaskID, MCT_light_reset);
-        tmos_start_task(mTaskID, MCT_light_reset, MS1_TO_SYSTEM_TIME(22 * 100));
-
-        switch (btn_event_val) {
-        case PRESS_DOWN:
+    // PRINT("%d , %d\n", index, btn_event_val);
+    if (btn_event_val == PRESS_DOWN)
+        running_data.ws2812_mode = index;
+    if (running_data.edit_flag == 1) {
+        running_data.have_edit = 1;
+        if (btn_event_val == PRESS_DOWN) {
             set_mode(index);
+            running_data.mode_data = index;
         }
-        if (num_of_keys() >= 3) {
-            set_mode(3);
-        }
-    } else if (running_data.mode_data == 0) {
-        if (!btn_event_val) {
-            data_in_fram.osu_mode_key_count[index]++;
-        }
-        switch (index) {
-        case 0:
-            keyboard_press_key_code_1(Keyboard_ESCAPE, !btn_event_val);
-            break;
-        case 1:
-            keyboard_press_char_1('z', !btn_event_val);
-            break;
-        case 2:
-            keyboard_press_char_1('x', !btn_event_val);
-            break;
-        case 3:
-            // custom_press_key_1(MUTE, !btn_event_val);
-            keyboard_press_key_code_1(HID_KEYBPAD_ADD, !btn_event_val);
-            // mouse_set_continue_click(KEY_LEFT, !btn_event_val);
-            break;
-        }
-    } else if (running_data.mode_data == 1) {
-        user_defined_mode(index, !btn_event_val);
-    } else if (running_data.mode_data == 2) {
-        switch (index) {
-        case 0:
-            keyboard_press_sp_key_1(LEFT_CTRL, !btn_event_val);
-            keyboard_press_char_1('s', !btn_event_val);
-            // keyboard_press_char_1(' ', !btn_event_val);
-            // keyboard_press_key_code_1(Keyboard_ESCAPE, !btn_event_val);
-            break;
-        case 1:
-            keyboard_press_sp_key_1(LEFT_CTRL, !btn_event_val);
-            keyboard_press_char_1('c', !btn_event_val);
-            break;
-        case 2:
-            keyboard_press_sp_key_1(LEFT_CTRL, !btn_event_val);
-            keyboard_press_char_1('v', !btn_event_val);
-            break;
-        case 3:
-            keyboard_press_key_code_1(Keyboard_ESCAPE, !btn_event_val);
-            // keyboard_press_char_1('z', !btn_event_val);
-            break;
-        }
-        // if (num_of_keys() > 1)
-        // {
-        // 	// touch_set_continue_function(1);
-        // 	mouse_set_continue_click(KEY_LEFT, 20);
-        // 	keyboard_press_char_1('z', 0);
-        // 	keyboard_press_char_1('x', 0);
-        // 	keyboard_press_key_code_1(Keyboard_ESCAPE, 0);
-        // }
-        // else
-        // {
-        // 	// touch_set_continue_function(0);
-        // 	mouse_set_continue_click(KEY_LEFT, 0);
-        // }
-    } else if (running_data.mode_data == 3) {
-        mode3_mode[index] = !btn_event_val;
-        switch (index) {
-        case 0:
-            keyboard_press_char_1(' ', !btn_event_val);
-            break;
-        case 1:
-            // keyboard_press_char_1('a', !btn_event_val);
-            break;
-        case 2:
-            // keyboard_press_char_1('s', !btn_event_val);
-            break;
-        case 3:
-            if (btn_event_val != PRESS_DOWN)
-                break;
-            int have = 0;
-            for (int i = 1; i < 3 && have == 0; i++) {
-                if (mode3_mode[i]) {
-                    have = 1;
-                    switch (i) {
-                    // case 0:
-                    //   break;
-                    case 1:
-                        custom_press_key(MUTE, 1);
-                        break;
-                    case 2:
-                        custom_press_key(PAUSE_PLAY, 1);
-                        break;
-                    }
-                }
-            }
-            if (have == 0)
-                keyboard_press_char('z', 1);
-
-            break;
-        }
-        if (num_of_keys() > 1) {
-            keyboard_press_key_code_1(Keyboard_ESCAPE, 1);
-        } else {
-            keyboard_press_key_code_1(Keyboard_ESCAPE, 0);
+    } else if (running_data.edit_flag == 0) {
+        if (running_data.mode_data < 3)
+            user_defined_mode(index, !btn_event_val, running_data.mode_data);
+        else {
+            // switch (index) {
+            // case 0:
+            //     keyboard_press_key_code_1(Keyboard_CapLock, !btn_event_val);
+            //     break;
+            // case 1:
+            //     keyboard_press_sp_key_1(LEFT_CTRL, !btn_event_val);
+            //     keyboard_press_char_1('a', !btn_event_val);
+            //     break;
+            // case 2:
+            //     keyboard_press_char_1('x', !btn_event_val);
+            //     break;
+            // case 3:
+            //     // custom_press_key_1(MUTE, !btn_event_val);
+            //     keyboard_press_key_code_1(HID_KEYBPAD_ADD, !btn_event_val);
+            //     // mouse_set_continue_click(KEY_LEFT, !btn_event_val);
+            //     break;
+            // }
         }
     }
-
     return;
 }
 void key44longcallback(void *button)
@@ -391,6 +209,37 @@ void key44longcallback(void *button)
     // 	break;
     // }
 }
+void key_power_callback(void *button)
+{
+    uint32_t   index;
+    PressEvent btn_event_val;
+    btn_event_val = get_button_event((struct Button *) button);
+    index         = ((struct Button *) button)->func_para;
+    switch (btn_event_val) {
+    case PRESS_DOWN: {
+        running_data.edit_flag               = 1;
+        running_data.have_edit               = 0;
+        running_data.ws2812_mode_ignore_flag = 1;
+        for (int i = 0; i < LED_NUM; i++) {
+            ws2812_list[i].hex = 0;
+        }
+        set_mode(running_data.mode_data);
+        break;
+    }
+    case PRESS_UP: {
+        running_data.edit_flag               = 0;
+        running_data.ws2812_mode_ignore_flag = 0;
+        tmos_set_event(mTaskID, MCT_PIC_DISPLAY);
+        break;
+    }
+    case LONG_PRESS_START: {
+        if (running_data.have_edit == 0) {
+            tmos_set_event(mTaskID, MCT_START_POWER_OFF);
+        }
+        break;
+    }
+    }
+}
 void my_button_init(void)
 {
     int8_t i;
@@ -401,10 +250,12 @@ void my_button_init(void)
         button_attach(keys__uz + i, PRESS_DOWN, key44callback);
         button_attach(keys__uz + i, PRESS_UP, key44callback);
         if (i == 4) {
+            button_attach(keys__uz + i, PRESS_DOWN, key_power_callback);
+            button_attach(keys__uz + i, PRESS_UP, key_power_callback);
             // button_attach(keys__uz + i, PRESS_REPEAT, key44longcallback);
             // button_attach(keys__uz + i, SINGLE_CLICK, key44longcallback);
             // button_attach(keys__uz + i, DOUBLE_CLICK, key44longcallback);
-            // button_attach(keys__uz + i, LONG_PRESS_START, key44longcallback);
+            button_attach(keys__uz + i, LONG_PRESS_START, key_power_callback);
             // button_attach(keys__uz + i, LONG_PRESS_HOLD, key44longcallback);
         }
         button_start(keys__uz + i);

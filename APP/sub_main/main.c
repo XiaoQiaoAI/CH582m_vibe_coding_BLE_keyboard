@@ -1,5 +1,6 @@
 #include "main.h"
-
+#include "command_solve.h"
+#include "w25qxx.h"
 // const uint8_t  usb_name[]   = {0x42, 0x30, 0x63, 0x30, 0x64, 0x30, 0x44, 0x30, 0x26, 0x20, 0x0D, 0x00, 0x0A,
 //                                0x00, 0x91, 0x66, 0x4F, 0x30, 0x66, 0x30, 0x72, 0x5E, 0x4B, 0x30, 0x89, 0x30,
 //                                0x73, 0x30, 0x5D, 0x30, 0x46, 0x30, 0x26, 0x20, 0x0D, 0x00, 0x0A, 0x00, 0xD5,
@@ -10,7 +11,25 @@ tmosTaskID     mTaskID      = INVALID_TASK_ID;
 data_in_fram_s data_in_fram = {0};
 running_data_s running_data;
 
-tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events);
+tmosEvents    MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events);
+const uint8_t defult_key_0_0[] = {0x73, 1, HID_KEYBOARD_CAPS_LOCK};
+const uint8_t defult_key_0_1[] = {0x73, 1, HID_KEYBOARD_RETURN};
+const uint8_t defult_key_0_2[] = {0x74,
+                                  12,
+                                  DOWN_KEY,
+                                  HID_KEYBOARD_DOWN_ARROW,
+                                  UP_KEY,
+                                  HID_KEYBOARD_DOWN_ARROW,
+                                  DOWN_KEY,
+                                  HID_KEYBOARD_DOWN_ARROW,
+                                  UP_KEY,
+                                  HID_KEYBOARD_DOWN_ARROW,
+                                  DOWN_KEY,
+                                  HID_KEYBOARD_RETURN,
+                                  UP_KEY,
+                                  HID_KEYBOARD_RETURN};
+const char   *defult_name[]    = {"Record", "Accept", "Reject", "Enter"};
+key_bund_s    key_bund;
 
 void sub_main_1(void)
 {
@@ -32,6 +51,19 @@ void sub_main_1(void)
     fram_read(0, &data_in_fram, sizeof(data_in_fram));
     running_data.mac_offset = data_in_fram._mac_offset;
     running_data.mode_data  = data_in_fram._mode_data;
+    uint32_t tmp            = 0;
+    EEPROM_READ(EEPROM_BLOCK_SIZE * 4 + 1024, &tmp, sizeof(tmp));
+    if (tmp == 0xFFFFFFFF) {
+        memset(&key_bund, 0, sizeof(key_bund));
+        memcpy(key_bund.user_key_bind[0][0], defult_key_0_0, sizeof(defult_key_0_0));
+        memcpy(key_bund.user_key_bind[0][1], defult_key_0_1, sizeof(defult_key_0_1));
+        memcpy(key_bund.user_key_bind[0][2], defult_key_0_2, sizeof(defult_key_0_2));
+        memcpy(key_bund.user_key_bind[0][3], defult_key_0_1, sizeof(defult_key_0_1));
+        for (int i = 0; i < 4; i++)
+            memcpy(key_bund.user_key_desc[0][i], defult_name[i], strlen(defult_name[i]));
+    } else {
+        EEPROM_READ(EEPROM_BLOCK_SIZE * 4 + 1024, &key_bund, sizeof(key_bund));
+    }
     //  ! devices_init
     //  --------------------------------------------------------------------
     // mouse_init();
@@ -69,46 +101,35 @@ void sub_main_1(void)
     TMR0_PWMEnable();
     led_set_mode(0, SMOOTH_ALL, 0);
     led_set_bk(20);
-    // ! ips --------------------------------------------------------------------
-    char txts[10];
-    GPIOB_SetBits(GPIO_Pin_17); // cs
-    GPIOB_ModeCfg(GPIO_Pin_17, GPIO_ModeOut_PP_5mA);
-    GPIOB_SetBits(GPIO_Pin_9);  // RST
-    GPIOB_ModeCfg(GPIO_Pin_9, GPIO_ModeOut_PP_5mA);
-    GPIOB_SetBits(GPIO_Pin_16); // RST
-    GPIOB_ModeCfg(GPIO_Pin_16, GPIO_ModeOut_PP_5mA);
-
-    GPIOPinRemap(ENABLE, RB_PIN_SPI0);
-    GPIOB_ModeCfg(GPIO_Pin_15 | GPIO_Pin_13 | GPIO_Pin_14, GPIO_ModeOut_PP_5mA);
-    SPI0_MasterDefInit();
-
-    RST_RESET;
-    DelayMs(5);
-    RST_SET;
-    DelayMs(1);
-    LCD_CS_RESET;
-    IPS_Write_Reg(0x11);
-    IPS_Init();
-    IPS_Clear(CYAN);
-    set_mode(running_data.mode_data);
-    sprintf(txts, "%d", running_data.mac_offset);
-    IPS_ShowString(159 - 8 * 1, 0, txts, MAGENTA);
-    IPS_ShowString(48, 0, "v", MAGENTA);
-    LCD_CS_SET;
+}
+void sw_state_change(uint8_t new)
+{
+    // 0 up, 1 down 2 mid
+    PRINT("sw to %d\n", new);
+}
+void read_sw_state(void)
+{
+    static int8_t last_state = -1;
+    uint8_t       ret        = 0;
+    GPIOB_SetBits(GPIO_Pin_5);
+    ret += !!GPIOB_ReadPortPin(GPIO_Pin_4);
+    GPIOB_ResetBits(GPIO_Pin_5);
+    ret += !!GPIOB_ReadPortPin(GPIO_Pin_4);
+    if (last_state != ret) {
+        last_state = ret;
+        sw_state_change(ret);
+    }
 }
 void sub_main(void)
 {
     mTaskID = TMOS_ProcessEventRegister(MCT_ProcessEvent);
     tmos_start_task(mTaskID, MCT_light_control, MS1_TO_SYSTEM_TIME(50));
     tmos_start_task(mTaskID, MCT_test_event, MS1_TO_SYSTEM_TIME(100));
-    tmos_start_task(mTaskID, MCT_POWER_OFF, MS1_TO_SYSTEM_TIME(999));
+    tmos_start_task(mTaskID, MCT_POWER_OFF_TIME_CHECK, MS1_TO_SYSTEM_TIME(999));
 
     // ! POWER ON --------------------------------------------------------------------
     LL_GPIO_SetOutputPin(GPIOA, GPIO_Pin_12);
     GPIO_SINGLE_INIT(GPIOA, GPIO_Pin_12, GPIO_ModeOut_PP_5mA);
-    // ! GD25Q256 --------------------------------------------------------------------
-    GPIOB_SetBits(GPIO_Pin_12); // cs
-    GPIOB_ModeCfg(GPIO_Pin_12, GPIO_ModeOut_PP_5mA);
     // ! buzz --------------------------------------------------------------------
     buzzerDriverInit();
     buzzerSetNewFrequency(0);
@@ -125,10 +146,15 @@ void sub_main(void)
     tmos_start_task(mTaskID, MCT_key_scan, MS1_TO_SYSTEM_TIME(98));
     // ! hid_dev
     // --------------------------------------------------------------------
-    tmos_start_task(mTaskID, MCT_event_update, MS1_TO_SYSTEM_TIME(56));
+    // tmos_start_task(mTaskID, MCT_event_update, MS1_TO_SYSTEM_TIME(56));
     // ps("%s, %d\n", __FILE__, __LINE__);
     // ! adc --------------------------------------------------------------------
     BP_ADC_Init();
+    uint16_t rawa_adc  = read_vbat_adc();
+    running_data.v_bat = __Map(rawa_adc, 0, 2888, 0, 329);
+    int p              = __Map(running_data.v_bat, 320, 415, 0, 100);
+    __LimitValue(p, 0, 100);
+    running_data.power_persent = p;
     tmos_start_task(mTaskID, MCT_adc_measure, MS1_TO_SYSTEM_TIME(50));
     // ! tim5_ch3_ll_dma_init  --------------------------------------------------------------------
     // ws2812_power_pin
@@ -138,6 +164,41 @@ void sub_main(void)
     tim5_ch3_ll_dma_init();
     change_2812_state(2);
     tmos_start_task(mTaskID, MCT_WS2812_MODE, 100);
+    // ! GD25Q256 1 --------------------------------------------------------------------
+    GPIOB_SetBits(GPIO_Pin_12); // cs
+    GPIOB_ModeCfg(GPIO_Pin_12, GPIO_ModeOut_PP_5mA);
+    command_data_buf_init();
+    // ! ips --------------------------------------------------------------------
+    GPIOB_SetBits(GPIO_Pin_17); // cs
+    GPIOB_ModeCfg(GPIO_Pin_17, GPIO_ModeOut_PP_5mA);
+    GPIOB_SetBits(GPIO_Pin_9);  // RST
+    GPIOB_ModeCfg(GPIO_Pin_9, GPIO_ModeOut_PP_5mA);
+    GPIOB_SetBits(GPIO_Pin_16); // RST
+    GPIOB_ModeCfg(GPIO_Pin_16, GPIO_ModeOut_PP_5mA);
+
+    GPIOPinRemap(ENABLE, RB_PIN_SPI0);
+    GPIOB_ModeCfg(GPIO_Pin_13 | GPIO_Pin_14, GPIO_ModeOut_PP_5mA);
+    GPIOB_ModeCfg(GPIO_Pin_15, GPIO_ModeIN_PD);
+    SPI0_MasterDefInit();
+    SPI0_CLKCfg(2);
+
+    RST_RESET;
+    DelayMs(5);
+    RST_SET;
+    DelayMs(1);
+    LCD_CS_RESET;
+    IPS_Init();
+    IPS_Clear(CYAN);
+    set_mode(running_data.mode_data);
+    LCD_CS_SET;
+    // ! GD25Q256 2 --------------------------------------------------------------------
+    W25QXX_Init();
+    PRINT("id %x\n", W25QXX_TYPE);
+
+    // key_bund.pic[0][2] = 1000 / 10;
+    // key_bund.pic[0][1] = 32;
+    // key_bund.pic[0][0] = 0;
+    tmos_start_task(mTaskID, MCT_PIC_DISPLAY, MS1_TO_SYSTEM_TIME(100));
 }
 tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
 {
@@ -154,20 +215,6 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
     }
     if (events & MCT_test_event) {
         static int index_t_ = 0;
-        // sprintf(txt, "%d", running_data.bt_connect_stat);
-        // ws2812_list[0].rgb.red -= 10;
-        // ws2812_list[0].rgb.green -= 5;
-
-        // IPS_ShowString(48, 0, running_data.bt_connect_stat == 2 ? "OK " : "ing", MAGENTA);
-        // if (running_data.mode_data == 0)
-        //     sprintf(txt, "%5d", data_in_fram.osu_mode_key_count[index_t_]);
-        // else
-        //     sprintf(txt, "%5d", data_in_fram.key_count[index_t_]);
-        // IPS_ShowString(112 + 4, 16 + index_t_ * 16, txt, MAGENTA);
-        // index_t_++;
-        // if (index_t_ >= 3)
-        //     index_t_ = 0;
-        // ps("key0 %d", data_in_fram.key_count[0]);
         tmos_start_task(mTaskID, MCT_test_event, MS1_TO_SYSTEM_TIME(10));
         return events ^ MCT_test_event;
     }
@@ -177,54 +224,43 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
         return events ^ MCT_light_control;
     }
     if (events & MCT_key_scan) {
-        static int t = 0;
+        static uint8_t t = 0;
+        if (t++ > 5) {
+            t = 0;
+            read_sw_state();
+        }
         key_scan();
-        // send_keyboard_data();
-        // tmos_set_event(mTaskID, MCT_event_update);
+        send_keyboard_data();
         button_ticks();
-        // t = !t;
-        // send_custom_control_data();
-        // if (t)
-        //     encode_get();
-
-        // tmos_set_event(mTaskID, MCT_event_update);
-        tmos_start_task(mTaskID, MCT_key_scan, MS1_TO_SYSTEM_TIME(1));
+        tmos_start_task(mTaskID, MCT_key_scan, MS1_TO_SYSTEM_TIME(3));
 
         return events ^ MCT_key_scan;
     }
-    if (events & MCT_event_update) {
-        static int i = 0;
-        static int t = 0;
-        i++;
-        switch (i) {
-        case 1:
-            send_keyboard_data();
-            break;
-        case 2:
-            t = !t;
-            send_custom_control_data();
-            // if (t)
-            //     encode_get();
-            i = 0;
-
-            break;
-        case 3:
-            // send_mouse_data();
-            // ps("Zero \n");
-            break;
-            // case 4:
-            //     break;
-        }
-        tmos_start_task(mTaskID, MCT_event_update, 3);
-        return events ^ MCT_event_update;
-    }
+    // if (events & MCT_event_update) {
+    //     static int i = 0;
+    //     i++;
+    //     switch (i) {
+    //     case 1:
+    //         send_keyboard_data();
+    //         break;
+    //     case 2:
+    //         send_custom_control_data();
+    //         i = 0;
+    //         break;
+    //     case 3:
+    //         // send_mouse_data();
+    //         break;
+    //     }
+    //     tmos_start_task(mTaskID, MCT_event_update, MS1_TO_SYSTEM_TIME(3));
+    //     return events ^ MCT_event_update;
+    // }
     if (events & MCT_adc_measure) {
-        // tmos_start_task(mTaskID, MCT_adc_measure, MS1_TO_SYSTEM_TIME(2 * 60 *
-        // 1000));
         tmos_start_task(mTaskID, MCT_adc_measure, MS1_TO_SYSTEM_TIME(60 * 1000));
-        uint16_t rawa_adc          = read_vbat_adc();
-        running_data.v_bat         = __Map(rawa_adc, 0, 2888, 0, 329);
-        running_data.power_persent = __Map(running_data.v_bat, 320, 415, 0, 100);
+        uint16_t rawa_adc  = read_vbat_adc();
+        running_data.v_bat = __Map(rawa_adc, 0, 2888, 0, 329);
+        int p              = __Map(running_data.v_bat, 320, 415, 0, 100);
+        __LimitValue(p, 0, 100);
+        running_data.power_persent = p;
         __LimitValue(running_data.power_persent, 0, 100);
         ps("adc %d\n", rawa_adc);
         ps("%% %d\n", running_data.power_persent);
@@ -244,43 +280,39 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
         if (running_data.v_bat > 440) {
             running_data.power_off_timeout += 60;
         }
-        sprintf(txt, "%1d.%02dV", running_data.v_bat / 100, running_data.v_bat % 100);
+        // sprintf(txt, "%1d.%02dV", running_data.v_bat / 100, running_data.v_bat % 100);
         ps("vbat = ");
         ps("%1d.%02dV", running_data.v_bat / 100, running_data.v_bat % 100);
         ps("\n");
-        IPS_ShowString(0, 0, txt, MAGENTA);
-
+        // IPS_ShowString(0, 0, txt, MAGENTA);
         return events ^ MCT_adc_measure;
-    }
-    if (events & MCT_light_reset) {
-        led_set_bk(1);
-        return events ^ MCT_light_reset;
     }
     if (events & MCT_music_ticks) {
         tmos_start_task(mTaskID, MCT_music_ticks, MS1_TO_SYSTEM_TIME(20));
         music_ticks();
         return events ^ MCT_music_ticks;
     }
-    if (events & MCT_POWER_OFF) {
-        tmos_start_task(mTaskID, MCT_POWER_OFF, MS1_TO_SYSTEM_TIME(1000));
+    if (events & MCT_POWER_OFF_TIME_CHECK) {
+        tmos_start_task(mTaskID, MCT_POWER_OFF_TIME_CHECK, MS1_TO_SYSTEM_TIME(1000));
         ps("pfc %2d:%02ds\n", running_data.power_off_timeout / 60, running_data.power_off_timeout % 60);
         if (running_data.usb_is_connected == 0) {
             if (running_data.power_off_timeout) {
-                // if (!IS_CHAEGING)
                 running_data.power_off_timeout--;
-                // fram_read(0, &data_in_fram, sizeof(data_in_fram));
-                // for (int i = 0; i < 128; i++)
-                // {
-                //     ps("%02x ", *(((uint8_t *)&data_in_fram) + i));
-                // }
-                // ps("\n");
             } else {
-                start_music(3);
-                tmos_start_task(mTaskID, MCT_POWER_OFF_buzz, MS1_TO_SYSTEM_TIME(500));
-                tmos_stop_task(mTaskID, MCT_POWER_OFF);
+                tmos_set_event(mTaskID, MCT_START_POWER_OFF);
             }
         }
-        return events ^ MCT_POWER_OFF;
+        return events ^ MCT_POWER_OFF_TIME_CHECK;
+    }
+    if (events & MCT_START_POWER_OFF) {
+        start_music(3);
+        running_data.ws2812_mode = 0xff;
+        for (int i = 0; i < LED_NUM; i++) {
+            ws2812_list[i].hex = 0xffff0000;
+        }
+        tmos_start_task(mTaskID, MCT_POWER_OFF_buzz, MS1_TO_SYSTEM_TIME(500));
+        tmos_stop_task(mTaskID, MCT_POWER_OFF_TIME_CHECK);
+        return events ^ MCT_START_POWER_OFF;
     }
     if (events & MCT_POWER_OFF_buzz) {
         buzzerStop();
@@ -289,156 +321,84 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
     }
     if (events & MCT_WS2812_MODE) {
         tmos_start_task(mTaskID, MCT_WS2812_MODE, MS1_TO_SYSTEM_TIME(50));
-
-        static uint8_t led_position = 0;
-        static int8_t  direction    = 1; // 1 = forward, -1 = backward
-
-        switch (running_data.ws2812_mode) {
-        case WS2812_OFF:
-            // Turn off all LEDs
-            for (int i = 0; i < LED_NUM; i++) {
-                ws2812_list[i].hex = 0;
-            }
-            break;
-
-        case WS2812_SINGLE_MOVE:
-            // Clear all LEDs first
-            for (int i = 0; i < LED_NUM; i++) {
-                ws2812_list[i].hex = 0;
-            }
-
-// Set main LED at full brightness
-#define COLOR_HEX 0xff3333
-            ws2812_list[led_position].hex       = COLOR_HEX;
-            ws2812_list[led_position].rgb.alpha = 255;
-
-            // Set adjacent LEDs at 60% brightness
-            if (led_position > 0) {
-                ws2812_list[led_position - 1].hex       = COLOR_HEX;
-                ws2812_list[led_position - 1].rgb.alpha = 100; // 60% of 255
-            }
-            if (led_position < LED_NUM - 1) {
-                ws2812_list[led_position + 1].hex       = COLOR_HEX;
-                ws2812_list[led_position + 1].rgb.alpha = 100; // 60% of 255
-            }
-
-            // Set LEDs 2 positions away at 30% brightness
-            if (led_position > 1) {
-                ws2812_list[led_position - 2].hex       = COLOR_HEX;
-                ws2812_list[led_position - 2].rgb.alpha = 30; // 30% of 255
-            }
-            if (led_position < LED_NUM - 2) {
-                ws2812_list[led_position + 2].hex       = COLOR_HEX;
-                ws2812_list[led_position + 2].rgb.alpha = 30; // 30% of 255
-            }
-
-            // Update position for next iteration
-            led_position += direction;
-
-            // Bounce back when reaching the end
-            if (led_position >= LED_NUM - 1) {
-                led_position = LED_NUM - 1;
-                direction    = -1;
-            } else if (led_position <= 0) {
-                led_position = 0;
-                direction    = 1;
-            }
-            break;
-
-        case WS2812_RAINBOW_WAVE: {
-            static uint8_t hue_offset = 0;
-
-            // Create rainbow wave across all LEDs
-            for (int i = 0; i < LED_NUM; i++) {
-                // Calculate hue for this LED (0-255 range)
-                // Spread rainbow across LEDs and add time-based offset for animation
-                uint8_t hue = (i * 256 / LED_NUM + hue_offset) & 0xFF;
-
-                // Simple HSV to RGB conversion (S=255, V=255)
-                uint8_t region    = hue / 43; // 0-5
-                uint8_t remainder = (hue - (region * 43)) * 6;
-
-                uint8_t r = 0, g = 0, b = 0;
-
-                switch (region) {
-                case 0:
-                    r = 255;
-                    g = remainder;
-                    b = 0;
-                    break;
-                case 1:
-                    r = 255 - remainder;
-                    g = 255;
-                    b = 0;
-                    break;
-                case 2:
-                    r = 0;
-                    g = 255;
-                    b = remainder;
-                    break;
-                case 3:
-                    r = 0;
-                    g = 255 - remainder;
-                    b = 255;
-                    break;
-                case 4:
-                    r = remainder;
-                    g = 0;
-                    b = 255;
-                    break;
-                default:
-                    r = 255;
-                    g = 0;
-                    b = 255 - remainder;
-                    break;
-                }
-
-                ws2812_list[i].rgb.red   = r;
-                ws2812_list[i].rgb.green = g;
-                ws2812_list[i].rgb.blue  = b;
-                ws2812_list[i].rgb.alpha = 255; // Slightly dimmed for smoother look
-            }
-
-            // Advance the wave animation
-            hue_offset -= 10;
-        } break;
-
-        case WS2812_BREATHING: {
-            static uint8_t brightness = 0;
-            static int8_t  fade_dir   = 1; // 1 = fade in, -1 = fade out
-
-// Define breathing color (soft blue)
-#define BREATH_COLOR_R 50
-#define BREATH_COLOR_G 100
-#define BREATH_COLOR_B 255
-
-            // Set all LEDs to the same color with current brightness
-            for (int i = 0; i < LED_NUM; i++) {
-                ws2812_list[i].rgb.red   = BREATH_COLOR_R;
-                ws2812_list[i].rgb.green = BREATH_COLOR_G;
-                ws2812_list[i].rgb.blue  = BREATH_COLOR_B;
-                ws2812_list[i].rgb.alpha = brightness;
-            }
-
-            // Update brightness for breathing effect
-            brightness += fade_dir * 8;
-
-            // Reverse direction at min/max brightness
-            if (brightness >= 250) {
-                brightness = 250;
-                fade_dir   = -1;
-            } else if (brightness <= 50) {
-                brightness = 50;
-                fade_dir   = 1;
-            }
-        } break;
-
-        default:
-            break;
+        if (running_data.ws2812_mode_ignore_flag == 0) {
+            ws2812_display(running_data.ws2812_mode, running_data.ws2812_single_color);
         }
         for (int i = 0; i < LED_NUM; i++)
             update_bit(i);
         return events ^ MCT_WS2812_MODE;
     }
+    if (events & MCT_COMMAND_TODO) {
+        if (command_data && command_len > 0) {
+            command_process(command_data, command_len);
+            command_process_ok();
+        }
+        command_in_process = 0;
+        return events ^ MCT_COMMAND_TODO;
+    }
+    if (events & MCT_DATA_TODO) {
+        // PRINT("st%p, ed%p\n", running_data.data_address, running_data.data_end_address);
+        if (running_data.data_address < running_data.data_end_address) {
+            if (0 < lwrb_get_full(&ble_data_lwrb)) {
+                uint8_t *d   = lwrb_get_linear_block_read_address(&ble_data_lwrb);
+                uint16_t len = lwrb_get_linear_block_read_length(&ble_data_lwrb);
+                W25QXX_Write_NoCheck(d, running_data.data_address, len);
+                lwrb_skip(&ble_data_lwrb, len);
+                running_data.data_address += len;
+                if (0 < lwrb_get_full(&ble_data_lwrb)) {
+                    tmos_set_event(mTaskID, MCT_DATA_TODO);
+                }
+                if (running_data.data_address >= running_data.data_end_address) {
+                    command_return(0x81, 0);
+                    if (running_data.data_end_address % 4096 == 1024) {
+                        running_data.pic_writing = 0;
+                        tmos_start_task(mTaskID, MCT_PIC_DISPLAY, MS1_TO_SYSTEM_TIME(200));
+                    }
+                }
+            }
+        }
+        return events ^ MCT_DATA_TODO;
+    }
+    if (events & MCT_PIC_DISPLAY) {
+        if (running_data.pic_writing) {
+            return events ^ MCT_PIC_DISPLAY;
+        }
+        if (!running_data.edit_flag && running_data.mode_data < 3 && key_bund.pic[running_data.mode_data][1] > 0) {
+            if (running_data.pic_index >= key_bund.pic[running_data.mode_data][1])
+                running_data.pic_index = 0;
+            __attribute__((aligned(4))) uint8_t tmp_d[3658];
+
+            uint16_t remain  = 160 * 80 * 2;
+            uint32_t address = (key_bund.pic[running_data.mode_data][0] + running_data.pic_index) * 4096 * 7;
+            // PRINT("pic, %p %d\n", address, running_data.pic_index);
+            LCD_CS_RESET;
+            IPS_Addr_Set(0, 0, IPS_W - 1, IPS_H - 1);
+            LCD_CS_SET;
+            while (remain > 0) {
+                uint16_t this_len = remain > 3658 ? 3658 : remain;
+                // W25QXX_Read(tmp_d, address, this_len);
+                W25QXX_Read_start(address);
+                SPI0_MasterDMARecv(tmp_d, this_len);
+                W25QXX_Read_end();
+                LCD_CS_RESET;
+                // for (int i = 0; i < this_len; i++)
+                //     IPS_Write_Datauint8_t(tmp_d[i]);
+                SPI0_MasterDMATrans(tmp_d, this_len);
+                LCD_CS_SET;
+                remain -= this_len;
+                address += this_len;
+            }
+            running_data.pic_index++;
+            if (key_bund.pic[running_data.mode_data][1] > 1) {
+                if (key_bund.pic[running_data.mode_data][2] > 0) {
+                    tmos_start_task(mTaskID,
+                                    MCT_PIC_DISPLAY,
+                                    MS1_TO_SYSTEM_TIME(key_bund.pic[running_data.mode_data][2]));
+                }
+            }
+        }
+        return events ^ MCT_PIC_DISPLAY;
+    }
+
     return 0;
 }
