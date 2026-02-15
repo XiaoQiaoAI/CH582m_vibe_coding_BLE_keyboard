@@ -163,7 +163,8 @@ void            PSK_WCHBLE_Init(void)
 #endif
             memcpy(advertData__ + i,
                    exter_advertData,
-                   min(MAX_SCAN_RES_LEN - sizeof(exter_advertData), MAX_SCAN_RES_LEN - i));
+                   min(min(MAX_SCAN_RES_LEN - sizeof(exter_advertData), MAX_SCAN_RES_LEN - i),
+                       sizeof(exter_advertData)));
             advertData__len = i + sizeof(exter_advertData);
             // PRINT("adv LEN%d \n", advertData__len);
         }
