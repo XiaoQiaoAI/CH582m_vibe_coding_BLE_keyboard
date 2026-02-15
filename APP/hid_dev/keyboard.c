@@ -44,6 +44,7 @@ void          send_keyboard_data(void)
 #ifdef KEYBOARD_WITH_LWRB
     while (lwrb_get_full(&keyboard_command) >= 2 && data[0] != DELAY) {
         lwrb_read(&keyboard_command, (uint8_t *) data, 2);
+        PRINT("read %02x, %02x\n", data[0], data[1]);
         switch (data[0]) {
             // case SET_SP:
             //     add_special_code((enum keyboard_sp_key)data[1], data[2]);
@@ -57,27 +58,40 @@ void          send_keyboard_data(void)
 
         case DOWN_KEY:
             keyboard_press_key_code_1(data[1], 1);
-            // PRINT("%08x :key_down %02x\n", time_count, data[1]);
-            if (lwrb_peek(&keyboard_command, 0, (uint8_t *) next_data, 2) == 2)
+            PRINT("key_down %02x\n", data[1]);
+            if (lwrb_peek(&keyboard_command, 0, (uint8_t *) next_data, 2) == 2) {
                 if (data[1] == next_data[1] && next_data[0] == UP_KEY) {
                     data[0] = DELAY;
-                    data[1] = 0;
-                    // PRINT("%08x :same key_up %02x\n", time_count, next_data[1]);
+                    data[1] = 1;
+                    PRINT("same key_up %02x\n", next_data[1]);
                 }
+                if (next_data[0] == UP_ALLKEY) {
+                    data[0] = DELAY;
+                    data[1] = 1;
+                    PRINT("all key_up wait\n", next_data[1]);
+                }
+            }
 
             break;
         case UP_KEY:
             keyboard_press_key_code_1(data[1], 0);
-            // PRINT("%08x :key_up %02x\n", time_count, data[1]);
+            PRINT("key_up %02x\n", data[1]);
             if (lwrb_peek(&keyboard_command, 0, (uint8_t *) next_data, 2) == 2)
                 if (data[1] == next_data[1] && next_data[0] == DOWN_KEY) {
                     data[0] = DELAY;
-                    data[1] = 0;
-                    // PRINT("%08x :same key_down %02x\n", time_count, next_data[1]);
+                    data[1] = 1;
+                    PRINT("same key_down %02x\n", next_data[1]);
                 }
 
             break;
         case DELAY:
+            break;
+        case UP_ALLKEY:
+            tkeyboard_buff.special_key = 0;
+            memset(tkeyboard_buff.keys, 0, sizeof(tkeyboard_buff.keys));
+            memset(tkeyboard_buff.special_key_release_times, 0, sizeof(tkeyboard_buff.special_key_release_times));
+            memset(tkeyboard_buff.keys_release_times, 0, sizeof(tkeyboard_buff.keys_release_times));
+            PRINT("all key_up\n");
             break;
         }
     }
@@ -88,7 +102,7 @@ void          send_keyboard_data(void)
             data[0] = WAIT;
     }
 #endif
-
+    // PRINT("start_send\n");
     if (memcmp(&tkeyboard_buff_last, &tkeyboard_buff, keyboard_state.report_length) == 0) {
     } else {
         memcpy(&tkeyboard_buff_last, &tkeyboard_buff, keyboard_state.report_length);

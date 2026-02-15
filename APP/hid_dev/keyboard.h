@@ -21,6 +21,7 @@ enum kbd_co {
     DOWN_KEY,
     UP_KEY,
     DELAY,
+    UP_ALLKEY,
 };
 
 enum keyboard_key {
