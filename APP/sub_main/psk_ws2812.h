@@ -1,12 +1,21 @@
 #ifndef __psk_ws2812_H
 #define __psk_ws2812_H
 
-#include "main.h"
+#include "CONFIG.h"
+#include "HAL.h"
 
 // #define BIT_TRANSFER
 // #define HAL_DMA_PWM_transfer
 #define LL_DMA_PWM_transfer
-#define LED_NUM     8
+#define LED_NUM 8
+
+enum ws2812_mode_e {
+    WS2812_OFF = 0x0, // all led black (off)
+    WS2812_SINGLE_MOVE,
+    WS2812_RAINBOW_WAVE,
+    WS2812_BREATHING,
+
+};
 
 #define ONE_PULSE   (49)  // 1 码计数个数 //90/59
 #define ZERO_PULSE  (17)  // 0 码计数个数 //90/20
@@ -54,4 +63,5 @@ void        tim5_ch3_ll_dma_deinit(void);
 void        change_2812_state(int x);
 void        update_once(void);
 
+void ws2812_display(enum ws2812_mode_e mode, uint32_t COLOR_HEX);
 #endif
