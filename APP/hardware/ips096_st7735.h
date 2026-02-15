@@ -78,5 +78,7 @@ void IPS_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t c
 void IPS_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t mode, uint16_t color);
 void IPS_ShowString(uint16_t x, uint16_t y, const uint8_t *p, uint16_t color);
 // void IPS_ShowPicture(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+void IPS_Addr_Set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
+void IPS_Write_Datauint8_t(uint8_t data);
 
 #endif

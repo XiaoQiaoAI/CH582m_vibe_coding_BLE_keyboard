@@ -31,29 +31,30 @@ void IPS_Write_Bus(uint8_t data)
 
 void IPS_Write_Datauint8_t(uint8_t data)
 {
-    RS_SET;
+    // RS_SET;
     IPS_Write_Bus(data);
 }
 
 void IPS_Write_Datauint16_t(uint16_t data)
 {
-    RS_SET;
+    // RS_SET;
     // IPS_Write_Bus(data >> 8);
     // IPS_Write_Bus(data);
-    CS_RESET;
+    // CS_RESET;
     // HAL_SPI_Transmit(&ST7735_SPI, &data, 1, 0xff);
 
     // DelayMs(1);
     SPI0_MasterSendByte(data >> 8);     // 发送8位数据
     SPI0_MasterSendByte(data & 0x00ff); // 发送8位数据
     // IPS_Delay(7);
-    CS_SET;
+    // CS_SET;
 }
 
 void IPS_Write_Reg(uint8_t data)
 {
     RS_RESET;
     IPS_Write_Bus(data);
+    RS_SET;
 }
 
 void IPS_Addr_Set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
@@ -81,6 +82,7 @@ void IPS_Init(void)
     // SPI0_MasterSendByte(0x55);
     // GPIOA_SetBits(GPIO_Pin_12);
     // DelayMs(1);
+    IPS_Write_Reg(0x11);
 
     IPS_Write_Reg(0x21);
 
@@ -188,11 +190,35 @@ void IPS_Clear(uint16_t color)
 {
     uint16_t i, j;
     IPS_Addr_Set(0, 0, IPS_W - 1, IPS_H - 1);
-    for (i = 0; i < IPS_W; i++) {
-        for (j = 0; j < IPS_H; j++) {
-            IPS_Write_Datauint16_t(color);
+    // for (i = 0; i < IPS_W; i++) {
+    //     for (j = 0; j < IPS_H; j++) {
+    //         IPS_Write_Datauint16_t(color);
+    //     }
+    // }
+    // SPI0_MasterSendByte()
+    uint16_t remain = 160 * 80 * 2;
+    uint8_t  index  = 1;
+    while (remain > 0) {
+#define CHUNK_SIZE 4000
+        uint16_t this_len = remain > CHUNK_SIZE ? CHUNK_SIZE : remain;
+        uint16_t sendlen  = this_len;
+        uint8_t *d_p      = (uint8_t *) &color;
+        R8_SPI0_CTRL_MOD &= ~RB_SPI_FIFO_DIR; // 设置数据方向为输出
+        R16_SPI0_TOTAL_CNT = sendlen;         // 设置要发送的数据长度
+        R8_SPI0_INT_FLAG   = RB_SPI_IF_CNT_END;
+
+        while (sendlen) {
+            if (R8_SPI0_FIFO_COUNT < SPI_FIFO_SIZE) {
+                R8_SPI0_FIFO = d_p[index];
+                index        = !index;
+                sendlen--;
+            }
         }
+        while (R8_SPI0_FIFO_COUNT != 0)
+            ; // 等待FIFO中的数据全部发送完成
+        remain -= this_len;
     }
+
     BACK_COLOR = color;
 }
 
