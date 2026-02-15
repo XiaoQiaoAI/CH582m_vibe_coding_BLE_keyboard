@@ -4,7 +4,7 @@
 
 #ifdef KEYBOARD_WITH_LWRB
 #include "lwrb.h"
-#define COMMAND_SIZE 100
+#define COMMAND_SIZE 256
 #else
 // #warning "No using command buff, DELAY using HAL_Delay() instead"
 #endif
