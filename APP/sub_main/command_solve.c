@@ -75,6 +75,10 @@ void command_process(uint8_t *d, uint32_t len)
     for (int i = 0; i < len; i++)
         ps("%02x ", d[i]);
     ps("\n");
+    if (d[0] == 0) {
+        command_return_state();
+        return;
+    }
 
     ps("len= %d\n", len);
     if (d[0] == 0x01) // change _name
@@ -115,17 +119,13 @@ void command_process(uint8_t *d, uint32_t len)
                 memset(key_bund.user_key_bind[d[2]][d[3]], 0, sizeof(key_bund.user_key_bind[0][0]));
                 memcpy(key_bund.user_key_bind[d[2]][d[3]] + 2,
                        d + 4,
-                       min(len - 4, sizeof(key_bund.user_key_bind[0][0] - 2)));
+                       min(len - 4, sizeof(key_bund.user_key_bind[0][0]) - 2));
                 key_bund.user_key_bind[d[2]][d[3]][0] = d[1];
                 key_bund.user_key_bind[d[2]][d[3]][1] = min(len - 4, sizeof(key_bund.user_key_bind[0][0]) - 2);
+                // for (int i = 0; i < 20; i++)
+                //     ps("%02x ", key_bund.user_key_bind[d[2]][d[3]][i]);
+                // ps("\n");
             }
-            // memset(data_in_fram.user_key_bind[d[2]], 0, sizeof(data_in_fram.user_key_bind[0]));
-            // memcpy(data_in_fram.user_key_bind[d[2]] + 2, d + 3, min(len - 3, sizeof(data_in_fram.user_key_bind[0]) - 2));
-            // data_in_fram.user_key_bind[d[2]][0] = d[1];
-            // data_in_fram.user_key_bind[d[2]][1] = min(len - 3, sizeof(data_in_fram.user_key_bind[0]) - 2);
-            // for (int i = 0; i < 20; i++)
-            //     ps("%02x ", data_in_fram.user_key_bind[d[2]][i]);
-            // ps("\n");
         }
         if (d[1] == 0x75) {
             if (d[2] < 3 && d[3] < 4) {
@@ -175,6 +175,13 @@ void command_process(uint8_t *d, uint32_t len)
                   key_bund.pic[d[1]][2]);
         }
     }
+    if (d[0] == 0x90) {
+        // claude state update
+        running_data.claude_state = d[1];
+        PRINT("CLAUDE STATE %d\n", d[1]);
+        update_claude_ws2812();
+        return;
+    }
     command_return(d[0], 0);
 }
 void command_return(uint8_t id, uint8_t code)
@@ -189,6 +196,26 @@ void command_return(uint8_t id, uint8_t code)
     ret[ret_len++]  = 0xdd;
     peripheralChar4Notify(ret, ret_len);
 }
+void command_return_state(void)
+{
+    uint8_t ret[20];
+    uint8_t ret_len = 0;
+    ret[ret_len++]  = 0xaa;
+    ret[ret_len++]  = 0xbb;
+    ret[ret_len++]  = 0;
+    ret[ret_len++]  = running_data.power_persent; // data[0] = info.BatteryLevel;
+    ret[ret_len++]  = 50;                         // data[1] = info.SignalStrength;
+    ret[ret_len++]  = 1;                          // data[2] = info.FirmwareVersionMain;
+    ret[ret_len++]  = 0;                          // data[3] = info.FirmwareVersionSub;
+    ret[ret_len++]  = running_data.mode_data;     // data[4] = info.WorkMode;
+    ret[ret_len++]  = running_data.ws2812_mode;   // data[5] = info.LightMode;
+    ret[ret_len++]  = running_data.sw_state;      // data[6] = info.SwitchState;
+    ret[ret_len++]  = 0;                          // data[7] = info.Reserve;
+    ret[ret_len++]  = 0xcc;
+    ret[ret_len++]  = 0xdd;
+    peripheralChar4Notify(ret, ret_len);
+}
+
 void command_process_ok(void)
 {
     command_in_process = 0;

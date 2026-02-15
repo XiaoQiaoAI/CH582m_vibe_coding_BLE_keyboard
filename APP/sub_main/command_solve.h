@@ -9,6 +9,7 @@ void command_process(uint8_t *d, uint32_t len);
 void command_process_ok(void);
 void command_data_buf_init(void);
 void command_return(uint8_t id, uint8_t code);
+void command_return_state(void);
 
 extern lwrb_t   ble_data_lwrb;
 extern uint8_t *command_data;

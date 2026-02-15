@@ -55,6 +55,17 @@ enum music_flag {
     MUS_cus  = 0x10
 
 };
+enum claude_state_e {
+    CL_Notification,
+    CL_PermissionRequest,
+    CL_PostToolUse,
+    CL_PreToolUse,
+    CL_SessionStart,
+    CL_Stop,
+    CL_TaskCompleted,
+    CL_UserPromptSubmit,
+    CL_SessionEnd,
+};
 typedef struct
 {
     uint8_t mac_offset;
@@ -76,6 +87,9 @@ typedef struct
     uint32_t data_end_address; // not include
     uint8_t  pic_index;
     uint8_t  pic_writing;
+
+    uint8_t             sw_state;
+    enum claude_state_e claude_state;
 
 } running_data_s;
 // #pragma pack(1)
@@ -117,6 +131,8 @@ extern tmosTaskID     mTaskID;
 #include "psk_ws2812.h"
 void usb_desc_set(void);
 void init_desp(void);
+
+void update_claude_ws2812(void);
 
 void sub_main(void);
 void sub_main_1(void);

@@ -104,8 +104,11 @@ void sub_main_1(void)
 }
 void sw_state_change(uint8_t new)
 {
+    running_data.sw_state = new;
+    command_return_state();
     // 0 up, 1 down 2 mid
     PRINT("sw to %d\n", new);
+    update_claude_ws2812();
 }
 void read_sw_state(void)
 {
@@ -195,10 +198,9 @@ void sub_main(void)
     W25QXX_Init();
     PRINT("id %x\n", W25QXX_TYPE);
 
-    // key_bund.pic[0][2] = 1000 / 10;
-    // key_bund.pic[0][1] = 32;
-    // key_bund.pic[0][0] = 0;
     tmos_start_task(mTaskID, MCT_PIC_DISPLAY, MS1_TO_SYSTEM_TIME(100));
+    running_data.ws2812_mode         = WS2812_RAINBOW_WAVE_SLOW;
+    running_data.ws2812_single_color = 0x020a0ff;
 }
 tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
 {
@@ -401,4 +403,48 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
     }
 
     return 0;
+}
+
+void update_claude_ws2812(void)
+{
+    if (running_data.mode_data != 0)
+        return;
+    switch (running_data.claude_state) {
+    case CL_SessionStart: {
+        running_data.ws2812_mode         = WS2812_MIDDLE_LIGHT;
+        running_data.ws2812_single_color = 0xf02029;
+    } break;
+    case CL_PostToolUse:
+    case CL_UserPromptSubmit: {
+        running_data.ws2812_mode         = WS2812_SINGLE_MOVE;
+        running_data.ws2812_single_color = 0xf02029;
+    } break;
+    case CL_PermissionRequest: {
+        running_data.ws2812_mode         = WS2812_BREATHING;
+        running_data.ws2812_single_color = 0xf02029;
+    } break;
+    case CL_PreToolUse: {
+        running_data.ws2812_mode         = WS2812_SINGLE_MOVE;
+        running_data.ws2812_single_color = 0x2050FF;
+    } break;
+    case CL_Stop: {
+        running_data.ws2812_mode         = WS2812_MIDDLE_LIGHT;
+        running_data.ws2812_single_color = 0xf02029;
+    } break;
+    case CL_SessionEnd: {
+        running_data.ws2812_mode = WS2812_RAINBOW_WAVE_SLOW;
+    } break;
+    }
+    if (running_data.sw_state == 0) { // auto mode cover
+        switch (running_data.claude_state) {
+        case CL_PostToolUse:
+        case CL_UserPromptSubmit: {
+            running_data.ws2812_mode = WS2812_RAINBOW_MOVE;
+        } break;
+        case CL_PermissionRequest:
+        case CL_PreToolUse: {
+            running_data.ws2812_mode = WS2812_RAINBOW_WAVE;
+        } break;
+        }
+    }
 }
