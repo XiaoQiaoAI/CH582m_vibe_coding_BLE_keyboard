@@ -1,27 +1,13 @@
-#include "main.h"
-// #include "zf_driver_soft_iic.h"
 #include "ch_flash.h"
-// soft_iic_info_struct fram_iic;
+#include "main.h"
 #define MB85RC16_BASE_ADDR 0x50
-void fram_init(void)
-{
-    // soft_iic_init(&fram_iic, MB85RC16_BASE_ADDR, 0, GPIOB, GPIO_Pin_18, GPIOB,
-    // GPIO_Pin_19); fram_iic
-}
+void fram_init(void) {}
 void fram_read(uint16_t addr, uint8_t *data, uint16_t len)
 {
-    // fram_iic.addr = MB85RC16_BASE_ADDR | ((addr >> 8) & 0x07);
-    // soft_iic_read_8bit_registers(&fram_iic, addr & 0x0ff, data, len);
-    // PRINT("read %x, len %d\n", addr, len);
     eeprom_read_data(addr, data, len);
 }
 void fram_write(uint16_t addr, uint8_t *data, uint16_t len)
 {
-    // fram_iic.addr = MB85RC16_BASE_ADDR | ((addr >> 8) & 0x07);
-    // soft_iic_write_8bit_registers(&fram_iic, addr & 0x0ff, data, len);
-    // PRINT("write %x, len %d\n", addr, len);
-    // for (int i = 0; i < len; i++)
-    //     PRINT("%02x ", data[i]);
     eeprom_write_data(addr, data, len);
 }
 void save_all_data_to_fram(void)

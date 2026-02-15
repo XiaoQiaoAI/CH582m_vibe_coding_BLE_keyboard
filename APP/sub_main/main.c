@@ -1,11 +1,7 @@
 #include "main.h"
 #include "command_solve.h"
 #include "w25qxx.h"
-// const uint8_t  usb_name[]   = {0x42, 0x30, 0x63, 0x30, 0x64, 0x30, 0x44, 0x30, 0x26, 0x20, 0x0D, 0x00, 0x0A,
-//                                0x00, 0x91, 0x66, 0x4F, 0x30, 0x66, 0x30, 0x72, 0x5E, 0x4B, 0x30, 0x89, 0x30,
-//                                0x73, 0x30, 0x5D, 0x30, 0x46, 0x30, 0x26, 0x20, 0x0D, 0x00, 0x0A, 0x00, 0xD5,
-//                                0x52, 0x44, 0x30, 0x66, 0x30, 0x6A, 0x30, 0x44, 0x30, 0x6E, 0x30, 0x6B, 0x30,
-//                                0x91, 0x66, 0x44, 0x30, 0x88, 0x30, 0x5E, 0xFF, 0x26, 0x20};
+
 const uint8_t  usb_name[]   = {0x4B, 0x6D, 0xD5, 0x8B};
 tmosTaskID     mTaskID      = INVALID_TASK_ID;
 data_in_fram_s data_in_fram = {0};
@@ -69,7 +65,7 @@ void sub_main_1(void)
     // mouse_init();
     keyboard_init();
     // touch_init();
-    custom_init();
+    // custom_init();
     void init_desp(void);
     init_desp();
     usb_set_name(usb_name, sizeof(usb_name));
@@ -90,13 +86,13 @@ void sub_main_1(void)
     // ! BACK_LIGHT
     // --------------------------------------------------------------------
     GPIOPinRemap(DISABLE, RB_PIN_TMR0);
-    GPIOA_ResetBits(GPIO_Pin_9); // ����PWM��
+    GPIOA_ResetBits(GPIO_Pin_9);
     GPIOA_ModeCfg(GPIO_Pin_9, GPIO_ModeOut_PP_5mA);
     TMR0_PWMInit(High_Level, PWM_Times_1);
-    TMR0_PWMCycleCfg(PWMCycleCfg); // ���� 100us
+    TMR0_PWMCycleCfg(PWMCycleCfg);
 
     TMR0_Disable();
-    TMR0_PWMActDataWidth(PWMCycleCfg - 1); // �޸�ռ�ձȱ�����ʱ�رն�ʱ��
+    TMR0_PWMActDataWidth(PWMCycleCfg - 1);
     TMR0_Enable();
     TMR0_PWMEnable();
     led_set_mode(0, SMOOTH_ALL, 0);
@@ -206,8 +202,7 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
 {
     uint8_t *msgPtr;
     char     txt[18];
-    if (events
-        & SYS_EVENT_MSG) { // ����HAL����Ϣ������tmos_msg_receive��ȡ��Ϣ��������ɺ�ɾ����Ϣ��?
+    if (events & SYS_EVENT_MSG) {
         msgPtr = tmos_msg_receive(task_id);
         if (msgPtr) {
             /* De-allocate */
@@ -238,24 +233,6 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
 
         return events ^ MCT_key_scan;
     }
-    // if (events & MCT_event_update) {
-    //     static int i = 0;
-    //     i++;
-    //     switch (i) {
-    //     case 1:
-    //         send_keyboard_data();
-    //         break;
-    //     case 2:
-    //         send_custom_control_data();
-    //         i = 0;
-    //         break;
-    //     case 3:
-    //         // send_mouse_data();
-    //         break;
-    //     }
-    //     tmos_start_task(mTaskID, MCT_event_update, MS1_TO_SYSTEM_TIME(3));
-    //     return events ^ MCT_event_update;
-    // }
     if (events & MCT_adc_measure) {
         tmos_start_task(mTaskID, MCT_adc_measure, MS1_TO_SYSTEM_TIME(60 * 1000));
         uint16_t rawa_adc  = read_vbat_adc();
@@ -282,11 +259,9 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
         if (running_data.v_bat > 440) {
             running_data.power_off_timeout += 60;
         }
-        // sprintf(txt, "%1d.%02dV", running_data.v_bat / 100, running_data.v_bat % 100);
         ps("vbat = ");
         ps("%1d.%02dV", running_data.v_bat / 100, running_data.v_bat % 100);
         ps("\n");
-        // IPS_ShowString(0, 0, txt, MAGENTA);
         return events ^ MCT_adc_measure;
     }
     if (events & MCT_music_ticks) {
@@ -339,7 +314,6 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
         return events ^ MCT_COMMAND_TODO;
     }
     if (events & MCT_DATA_TODO) {
-        // PRINT("st%p, ed%p\n", running_data.data_address, running_data.data_end_address);
         if (running_data.data_address < running_data.data_end_address) {
             if (0 < lwrb_get_full(&ble_data_lwrb)) {
                 uint8_t *d   = lwrb_get_linear_block_read_address(&ble_data_lwrb);
@@ -372,19 +346,15 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
 
             uint16_t remain  = 160 * 80 * 2;
             uint32_t address = (key_bund.pic[running_data.mode_data][0] + running_data.pic_index) * 4096 * 7;
-            // PRINT("pic, %p %d\n", address, running_data.pic_index);
             LCD_CS_RESET;
             IPS_Addr_Set(0, 0, IPS_W - 1, IPS_H - 1);
             LCD_CS_SET;
             while (remain > 0) {
                 uint16_t this_len = remain > 3658 ? 3658 : remain;
-                // W25QXX_Read(tmp_d, address, this_len);
                 W25QXX_Read_start(address);
                 SPI0_MasterDMARecv(tmp_d, this_len);
                 W25QXX_Read_end();
                 LCD_CS_RESET;
-                // for (int i = 0; i < this_len; i++)
-                //     IPS_Write_Datauint8_t(tmp_d[i]);
                 SPI0_MasterDMATrans(tmp_d, this_len);
                 LCD_CS_SET;
                 remain -= this_len;

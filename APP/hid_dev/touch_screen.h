@@ -55,8 +55,4 @@ void touch_set_continue_function(int8_t s);
  */
 __weak void touch_continue_function(void);
 
-#if USING_SHELL
-void touch_cmd(int argc, char **argv);
-#endif
-
 #endif

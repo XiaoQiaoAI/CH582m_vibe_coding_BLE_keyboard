@@ -1,10 +1,3 @@
-/*
- * @Author: Ptisak
- * @Date: 2023-02-14 18:58:00
- * @LastEditors: Ptisak
- * @LastEditTime: 2023-12-11 23:24:11
- * @Version: Do not edit
- */
 /********************************** (C) COPYRIGHT *******************************
  * File Name          : hidkbdservice.h
  * Author             : WCH

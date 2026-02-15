@@ -9,26 +9,28 @@
 #include "math.h"
 #include "stdlib.h"
 
-typedef struct {
-  uint8_t report_id;
-  uint8_t key;
-  int8_t mouse_rel_x;
-  int8_t mouse_rel_y;
-  int8_t mouse_rel_wheel;
+typedef struct
+{
+    uint8_t report_id;
+    uint8_t key;
+    int8_t  mouse_rel_x;
+    int8_t  mouse_rel_y;
+    int8_t  mouse_rel_wheel;
 } Mouse_buff;
 
 enum mouse_key { KEY_LEFT, KEY_RIGHT, KEY_WHELL };
 
 extern Mouse_buff tMouse_buff;
 
-typedef struct {
-  int16_t x;
-  int16_t y;
-  int16_t cur_x;
-  int16_t cur_y;
-  int8_t key[3];
-  uint8_t continue_key[3];
-  uint8_t continue_function;
+typedef struct
+{
+    int16_t x;
+    int16_t y;
+    int16_t cur_x;
+    int16_t cur_y;
+    int8_t  key[3];
+    uint8_t continue_key[3];
+    uint8_t continue_function;
 } mouse_state_t;
 
 extern mouse_state_t mouse_state;
@@ -72,8 +74,5 @@ void mouse_set_continue_function(int8_t s);
 void mouse_move(int16_t x, int16_t y);
 
 void rand_reset(void);
-#if USING_SHELL
-void mouse_cmd(int argc, char **argv);
-#endif
 
 #endif

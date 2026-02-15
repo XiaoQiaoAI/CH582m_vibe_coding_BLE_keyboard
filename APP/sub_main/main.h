@@ -1,17 +1,14 @@
 #ifndef __MAIN_H
 #define __MAIN_H
-// #define APPEARANCE GAP_APPEARE_HID_DIGITIZER_TYABLET
-// #define NAME "Ptisak42 wow~"
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 #include "psk_ps.h"
 
 enum my_event_name_e {
-    MCT_test_event    = (1 << 0),
-    MCT_light_control = (1 << 1),
-    MCT_key_scan      = (1 << 2),
-    // MCT_event_update         = (1 << 3),
+    MCT_test_event           = (1 << 0),
+    MCT_light_control        = (1 << 1),
+    MCT_key_scan             = (1 << 2),
     MCT_START_POWER_OFF      = (1 << 3),
     MCT_adc_measure          = (1 << 4),
     MCT_light_reset          = (1 << 5),

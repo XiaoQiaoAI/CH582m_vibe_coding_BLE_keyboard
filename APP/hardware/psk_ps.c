@@ -10,32 +10,7 @@ uint8_t USART_TX_BUF_PS[200] = {0x07, 0};
 
 void ps_putc(char *ch, unsigned short len)
 {
-    static uint8_t data_to_send[20] = {0};
-    static uint8_t pos              = 0;
-
-    // if (running_data.bt_connect_stat == 2) {
-    //     for (int i = 0; i < len; i++) {
-    //         if (ch[i] == '\r') {
-    //         } else if (ch[i] == '\n') {
-    //             peripheralChar4Notify(data_to_send, min(20, pos));
-    //             pos = 0;
-    //         } else {
-    //             if (pos < sizeof(data_to_send)) {
-    //                 data_to_send[pos] = ch[i];
-    //                 pos++;
-    //             }
-    //         }
-    //     }
-    // }
     PRINT(ch);
-    // peripheralChar4Notify(ch, min(20, len));
-    // for (int i = 0; i < len; i++)
-    // {
-    // 	while (!LL_USART_IsActiveFlag_TXE(USART3))
-    // 		;
-
-    // 	LL_USART_TransmitData8(USART3, ch[i]);
-    // }
 }
 
 // uint8_t ps_getc(char *ch, unsigned short len)

@@ -1,5 +1,4 @@
 #include "psk_ws2812.h"
-// #include "tim.h"
 #include "psk_ps.h"
 #include "string.h"
 
@@ -7,14 +6,6 @@ __attribute__((aligned(4))) size_tmp ws2812_bittmp_all[24 * LED_NUM + RESET_PULS
 
 // rgb
 color_t ws2812_list[LED_NUM] = {
-    // 0x0ff,     // 0
-    // 0x0ff00,   // 1
-    // 0x0ff0000, // 2
-    // 0x0ff2452, // 3
-    // 0xACFFE6,  // 4
-    // 0x0,       // 5
-    // 0x0,       // 6
-    // 0x0ffffff, // 7
     0,
 };
 color_t        list_last[LED_NUM] = {0};
@@ -25,8 +16,6 @@ void update_bit(uint16_t index)
 {
     static uint8_t last_global = 0;
     if (ws2812_list[index].hex == list_last[index].hex && last_global == ws2812_state.global_light) {
-        // if (ws2812_list[index].rgb.alpha == 0)
-        //     ws2812_state.zero_light_count++;
         return;
     } else {
         color_t   t = ws2812_list[index];
@@ -212,10 +201,8 @@ void tim5_ch3_ll_dma_init(void)
     for (int i = 0; i < LED_NUM; i++) {
         force_update_bit(i);
     }
-    // ws2812_state.global_light = 255;
     GPIOA_ModeCfg(GPIO_Pin_11, GPIO_ModeOut_PP_5mA);
     GPIOPinRemap(DISABLE, RB_PIN_TMR2);
-    // PRINT("TMR2 DMA PWM\n");
 
     TMR2_PWMCycleCfg(75); // ?? 1.25us
                           // TMR2
@@ -264,49 +251,7 @@ void TMR2_IRQHandler(void)
 {
     if (TMR2_GetITFlag(TMR1_2_IT_DMA_END)) {
         TMR2_ClearITFlag(TMR1_2_IT_DMA_END);
-        // // GPIOA_SetBits(GPIO_Pin_0);
-        // // TMR2_Disable();
-        // // TMR2_PWMActDataWidth(0); // ??? 50%, ??????????????
-        // TMR2_DMACfg(DISABLE, (uint16_t)(uint32_t)&ws2812_bittmp[0],
-        // (uint16_t)(uint32_t)&ws2812_bittmp[35], Mode_Single);
-        // // TMR2_Enable();
-
-        // // PRINT("int\n");
-        // // LL_DMA_ClearFlag_TC0(DMA1);
-        // // LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_0);
-        // // LL_TIM_DisableCounter(TIM5);
-        // if (ws2812_state.reseting_time)
-        // {
-        //   if (ws2812_state.reseting_time > 0)
-        //   {
-        //     ws2812_state.reseting_time--;
-        //     if (ws2812_state.reseting_time == RESET_PULSE / 24)
-        //       memset(ws2812_bittmp + 2, 0x0, sizeof(ws2812_bittmp));
-        //     // memset(ws2812_bittmp + 2, 0x0, sizeof(ws2812_bittmp));
-
-        //     // PRINT("Res\n");
-        //   }
-        // }
-        // else
-        // {
-        //   calc_bit(ws2812_state.cur_led);
-        //   ws2812_state.cur_led++;
-        //   if (ws2812_state.cur_led >= LED_NUM)
-        //   {
-        //     ws2812_state.cur_led = 0;
-        //     ws2812_state.reseting_time = RESET_PULSE / 24 + 1;
-        //   }
-        // }
-        // // GPIOA_ResetBits(GPIO_Pin_0);
-
-        // // TMR2_Enable();
-        // TMR2_DMACfg(ENABLE, (uint16_t)(uint32_t)&ws2812_bittmp[0],
-        // (uint16_t)(uint32_t)&ws2812_bittmp[31], Mode_LOOP);
-        // // TMR2_Enable();
     }
-    // LL_DMA_SetMemoryAddress(DMA1, LL_DMA_STREAM_0, (uint32_t)ws2812_bittmp);
-    // LL_TIM_EnableCounter(TIM5);
-    // LL_DMA_EnableStream(DMA1, LL_DMA_STREAM_0);
 }
 void tim5_ch3_ll_dma_deinit(void)
 {
@@ -315,10 +260,6 @@ void tim5_ch3_ll_dma_deinit(void)
                 (uint16_t) (uint32_t) &ws2812_bittmp_all[35],
                 Mode_Single);
     WS2812_OFF;
-
-    // LL_TIM_DisableCounter(TIM5);
-    // LL_DMA_DisableStream(DMA1, LL_DMA_STREAM_0);
-    // LL_TIM_DisableDMAReq_CC3(TIM5);
 }
 
 void change_2812_state(int x)

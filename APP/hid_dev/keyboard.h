@@ -164,10 +164,4 @@ void keyboard_press_char_1(char a, int8_t if_press);
 void keyboard_press_key_code_1(uint8_t k, int8_t if_press);
 void keyboard_press_sp_key_1(enum keyboard_sp_key k, int8_t if_press);
 
-#if USING_SHELL
-void keyboard_cmd(int argc, char **argv);
-void pstr(int argc, char **argv);
-void press(int argc, char **argv);
-#endif
-
 #endif

@@ -474,32 +474,16 @@ void MY_USB_HID_SEND_REPORT(uint8_t *report, uint16_t len)
         // if (running_data.usb_is_connected == 0) {
         if (1) {
             if (running_data.bt_connect_stat == 2) {
-                // PRINT("BLE\n");
                 HidDev_Report(HID_RPT_ID_KEY_IN, HID_REPORT_TYPE_INPUT, len, report);
             } else {
-                //                rf_send_data[0] = 0x01;
-                //                rf_send_data[1] = len & 0x00ff;
-                // PRINT("len %d\n", len);
-                //                tmos_memcpy(rf_send_data + 2, report, len);
-                // for (int i = 0; i < len + 2; i++)xzz
-                // 	PRINT("%02x ", rf_send_data[i]);
-                // PRINT("\n");
-                // PRINT("RF\n");
-                // RF_Shut();
-                // RF_Tx(rf_send_data, 20, 0xFF, 0xFF);
             }
         } else {
-            PRINT("21\n");
+            // PRINT("21\n");
             // if (*report == 0x01)
             // u2dev_update_report(report + 1, len - 1);
             // PRINT("USB\n");
             usb_EP1_send_report(report, len);
         }
-        // PRINT("%02X %02X %2d\n", report[0], report[1], len);
-        // }
-        // else
-        // PRINT("STOP:%02X %02X %2d\n", report[0], report[1], len);
-        // ;
     }
 #ifdef USING_CUSTOM_HID
     // USBD_CUSTOM_HID_SendReport_FS((uint8_t *)report, (uint16_t)len);

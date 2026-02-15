@@ -86,19 +86,14 @@ void command_process(uint8_t *d, uint32_t len)
         memset(data_in_fram.device_name, 0, sizeof(data_in_fram.device_name));
         memcpy(data_in_fram.device_name, d + 1, len - 1);
     }
-    if (d[0] == 0x02) // change _name
-    {
+    if (d[0] == 0x02) {
         memset(&data_in_fram.GAP_APPEARE, 0, sizeof(data_in_fram.GAP_APPEARE));
         memcpy(&data_in_fram.GAP_APPEARE, d + 1, len - 1);
     }
-    if (d[0] == 0x03) // change _name
-    {
+    if (d[0] == 0x03) {
         EEPROM_ERASE(EEPROM_BLOCK_SIZE * 4 + 1024, sizeof(key_bund));
         EEPROM_WRITE(EEPROM_BLOCK_SIZE * 4 + 1024, &key_bund, sizeof(key_bund));
         power_reset(0);
-        // memset(&data_in_fram.GAP_APPEARE, 0, sizeof(data_in_fram.GAP_APPEARE));
-        // memcpy(&data_in_fram.GAP_APPEARE, d + 1, len - 1);
-        // ps("GAP_APPEARE = %04x\n", data_in_fram.GAP_APPEARE);
     }
     if (d[0] == 0x04) // change _name
     {
@@ -122,9 +117,6 @@ void command_process(uint8_t *d, uint32_t len)
                        min(len - 4, sizeof(key_bund.user_key_bind[0][0]) - 2));
                 key_bund.user_key_bind[d[2]][d[3]][0] = d[1];
                 key_bund.user_key_bind[d[2]][d[3]][1] = min(len - 4, sizeof(key_bund.user_key_bind[0][0]) - 2);
-                // for (int i = 0; i < 20; i++)
-                //     ps("%02x ", key_bund.user_key_bind[d[2]][d[3]][i]);
-                // ps("\n");
             }
         }
         if (d[1] == 0x75) {
@@ -133,9 +125,6 @@ void command_process(uint8_t *d, uint32_t len)
                 memcpy(key_bund.user_key_desc[d[2]][d[3]], d + 4, min(len - 4, sizeof(key_bund.user_key_desc[0][0])));
             }
         }
-        // if (running_data.mode_data == 1) {
-        //     set_mode(running_data.mode_data);
-        // }
     }
     if (d[0] == 0x80 && len == 8) { // flash write
         if (d[1] == 0) {
