@@ -211,9 +211,11 @@ static void simpleProfileChangeCB(uint8_t paramID, uint8_t *pValue, uint16_t len
 {
     switch (paramID) {
     case SIMPLEPROFILE_CHAR1: {
-        uint8_t newValue[SIMPLEPROFILE_CHAR1_LEN];
-        tmos_memcpy(newValue, pValue, len);
-        PRINT("profile ChangeCB CHAR1.. \n");
+        // uint8_t newValue[SIMPLEPROFILE_CHAR1_LEN];
+        // tmos_memcpy(newValue, pValue, len);
+        // PRINT("profile ChangeCB CHAR1.. \n");
+        void receive_data(uint8_t * d, uint32_t len);
+        receive_data(pValue, len);
         break;
     }
 
@@ -221,7 +223,7 @@ static void simpleProfileChangeCB(uint8_t paramID, uint8_t *pValue, uint16_t len
         // uint8_t newValue[SIMPLEPROFILE_CHAR3_LEN];
         // tmos_memcpy(newValue, pValue, len);
         receive_bytes(pValue, len);
-        PRINT("profile ChangeCB CHAR3..%d\n", len);
+        // PRINT("profile ChangeCB CHAR3..%d\n", len);
         break;
     }
 

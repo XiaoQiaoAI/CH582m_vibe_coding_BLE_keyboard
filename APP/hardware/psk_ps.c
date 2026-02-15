@@ -1,4 +1,5 @@
 #include "psk_ps.h"
+#include "main.h"
 #include "stdarg.h"
 // uint8_t usart_recv_it_buff;
 
@@ -12,20 +13,20 @@ void ps_putc(char *ch, unsigned short len)
     static uint8_t data_to_send[20] = {0};
     static uint8_t pos              = 0;
 
-    if (running_data.bt_connect_stat == 2) {
-        for (int i = 0; i < len; i++) {
-            if (ch[i] == '\r') {
-            } else if (ch[i] == '\n') {
-                peripheralChar4Notify(data_to_send, min(20, pos));
-                pos = 0;
-            } else {
-                if (pos < sizeof(data_to_send)) {
-                    data_to_send[pos] = ch[i];
-                    pos++;
-                }
-            }
-        }
-    }
+    // if (running_data.bt_connect_stat == 2) {
+    //     for (int i = 0; i < len; i++) {
+    //         if (ch[i] == '\r') {
+    //         } else if (ch[i] == '\n') {
+    //             peripheralChar4Notify(data_to_send, min(20, pos));
+    //             pos = 0;
+    //         } else {
+    //             if (pos < sizeof(data_to_send)) {
+    //                 data_to_send[pos] = ch[i];
+    //                 pos++;
+    //             }
+    //         }
+    //     }
+    // }
     PRINT(ch);
     // peripheralChar4Notify(ch, min(20, len));
     // for (int i = 0; i < len; i++)

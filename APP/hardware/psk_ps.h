@@ -1,7 +1,8 @@
 #ifndef _PSK_PS
 #define _PSK_PS
 
-#include "main.h"
+#include "CONFIG.h"
+#include "HAL.h"
 #include "stdio.h"
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
