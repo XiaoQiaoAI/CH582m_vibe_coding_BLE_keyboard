@@ -87,7 +87,7 @@ typedef struct
 
     uint8_t             sw_state;
     enum claude_state_e claude_state;
-
+    uint8_t             have_update_custom_data;
 } running_data_s;
 // #pragma pack(1)
 typedef struct

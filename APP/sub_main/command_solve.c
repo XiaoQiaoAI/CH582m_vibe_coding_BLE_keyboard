@@ -12,13 +12,9 @@ lwrb_t   ble_data_lwrb;
 
 void receive_data(uint8_t *d, uint32_t len)
 {
-    // static uint16_t d_cnt = 0;
-    // d_cnt += len;
-    // PRINT("%d\n", d_cnt);
     if (len != lwrb_write(&ble_data_lwrb, d, len)) {
         PRINT("loss_data\n");
     }
-    // if (len != 20 || lwrb_get_full(&ble_data_lwrb) > 100)
     tmos_set_event(mTaskID, MCT_DATA_TODO);
 }
 
@@ -67,41 +63,30 @@ void receive_bytes(uint8_t *d, uint32_t len)
 }
 void command_process(uint8_t *d, uint32_t len)
 {
-    // ps("receive:");
+    // ps("rec:");
     // for (int i = 0; i < len; i++)
     //     ps("%02x ", d[i]);
     // ps("\n");
-    ps("rec:");
-    for (int i = 0; i < len; i++)
-        ps("%02x ", d[i]);
-    ps("\n");
-    if (d[0] == 0) {
+    // ps("len= %d\n", len);
+    if (d[0] == 0) { // update event
         command_return_state();
         return;
     }
 
-    ps("len= %d\n", len);
     if (d[0] == 0x01) // change _name
     {
         memset(data_in_fram.device_name, 0, sizeof(data_in_fram.device_name));
         memcpy(data_in_fram.device_name, d + 1, len - 1);
     }
-    if (d[0] == 0x02) {
+    if (d[0] == 0x02) { // change appearence
         memset(&data_in_fram.GAP_APPEARE, 0, sizeof(data_in_fram.GAP_APPEARE));
         memcpy(&data_in_fram.GAP_APPEARE, d + 1, len - 1);
     }
-    if (d[0] == 0x03) {
-        EEPROM_ERASE(EEPROM_BLOCK_SIZE * 4 + 1024, sizeof(key_bund));
-        EEPROM_WRITE(EEPROM_BLOCK_SIZE * 4 + 1024, &key_bund, sizeof(key_bund));
-        power_reset(0);
+    if (d[0] == 0x03) { // reset no use, beacuse program controls power, once stopped, no power can supply
+        // power_reset(0);
     }
-    if (d[0] == 0x04) // change _name
-    {
-        EEPROM_ERASE(EEPROM_BLOCK_SIZE * 4 + 1024, sizeof(key_bund));
-        EEPROM_WRITE(EEPROM_BLOCK_SIZE * 4 + 1024, &key_bund, sizeof(key_bund));
-        // memset(&data_in_fram.GAP_APPEARE, 0, sizeof(data_in_fram.GAP_APPEARE));
-        // memcpy(&data_in_fram.GAP_APPEARE, d + 1, len - 1);
-        // ps("GAP_APPEARE = %04x\n", data_in_fram.GAP_APPEARE);
+    if (d[0] == 0x04) { // save config
+        save_key_bound_data();
     }
     if (d[0] == 0x74) {
     } // old key mode
@@ -117,12 +102,17 @@ void command_process(uint8_t *d, uint32_t len)
                        min(len - 4, sizeof(key_bund.user_key_bind[0][0]) - 2));
                 key_bund.user_key_bind[d[2]][d[3]][0] = d[1];
                 key_bund.user_key_bind[d[2]][d[3]][1] = min(len - 4, sizeof(key_bund.user_key_bind[0][0]) - 2);
+                // for (int i = 0; i < 20; i++)
+                //     ps("%02x ", key_bund.user_key_bind[d[2]][d[3]][i]);
+                // ps("\n");
+                running_data.have_update_custom_data = 1;
             }
         }
         if (d[1] == 0x75) {
             if (d[2] < 3 && d[3] < 4) {
                 memset(key_bund.user_key_desc[d[2]][d[3]], 0x20, sizeof(key_bund.user_key_desc[0][0]));
                 memcpy(key_bund.user_key_desc[d[2]][d[3]], d + 4, min(len - 4, sizeof(key_bund.user_key_desc[0][0])));
+                running_data.have_update_custom_data = 1;
             }
         }
     }
@@ -143,7 +133,7 @@ void command_process(uint8_t *d, uint32_t len)
             running_data.pic_writing      = 1;
         }
     }
-    if (d[0] == 0x82 && len == 8) {
+    if (d[0] == 0x82 && len == 8) { // pic information update
         if (d[1] <= 2) {
             uint16_t t;
             t = d[2];
@@ -162,10 +152,31 @@ void command_process(uint8_t *d, uint32_t len)
                   key_bund.pic[d[1]][0],
                   key_bund.pic[d[1]][1],
                   key_bund.pic[d[1]][2]);
+            running_data.have_update_custom_data = 1;
         }
     }
-    if (d[0] == 0x90) {
-        // claude state update
+    if (d[0] == 0x83) { // pic information query
+        if (d[1] <= 2) {
+            uint8_t ret[20];
+            uint8_t ret_len = 0;
+            ret[ret_len++]  = 0xaa;
+            ret[ret_len++]  = 0xbb;
+            ret[ret_len++]  = 0x83;
+            ret[ret_len++]  = 0;
+            ret[ret_len++]  = d[1];
+            memcpy(ret + ret_len, (uint8_t *) (key_bund.pic[d[1]]), sizeof(key_bund.pic[0]));
+            ret_len += sizeof(key_bund.pic[0]);
+            uint16_t max_pic_size = 73;
+            memcpy(ret + ret_len, (uint8_t *) (&max_pic_size), sizeof(max_pic_size));
+            ret_len += sizeof(max_pic_size);
+            ret[ret_len++] = 0xcc;
+            ret[ret_len++] = 0xdd;
+            peripheralChar4Notify(ret, ret_len);
+        }
+        return;
+    }
+
+    if (d[0] == 0x90) { // claude state update
         running_data.claude_state = d[1];
         PRINT("CLAUDE STATE %d\n", d[1]);
         update_claude_ws2812();

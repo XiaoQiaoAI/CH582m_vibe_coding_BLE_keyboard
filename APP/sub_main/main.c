@@ -33,7 +33,7 @@ void sub_main_1(void)
     //  --------------------------------------------------------------------
     // ps("\nR8_RESET_STATUS 0x%02X\n", R8_RESET_STATUS);
 
-    // if ((R8_RESET_STATUS & RB_RESET_FLAG) == RST_FLAG_RPOR) // �ϵ縴λ, �ػ�
+    // if ((R8_RESET_STATUS & RB_RESET_FLAG) == RST_FLAG_RPOR)
     // {
     //     ps("\nRST_FLAG_RPOR, POWER OFF");
 
@@ -195,8 +195,9 @@ void sub_main(void)
     PRINT("id %x\n", W25QXX_TYPE);
 
     tmos_start_task(mTaskID, MCT_PIC_DISPLAY, MS1_TO_SYSTEM_TIME(100));
-    running_data.ws2812_mode         = WS2812_RAINBOW_WAVE_SLOW;
-    running_data.ws2812_single_color = 0x020a0ff;
+    running_data.ws2812_mode             = WS2812_RAINBOW_WAVE_SLOW;
+    running_data.ws2812_single_color     = 0x020a0ff;
+    running_data.have_update_custom_data = 0;
 }
 tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
 {

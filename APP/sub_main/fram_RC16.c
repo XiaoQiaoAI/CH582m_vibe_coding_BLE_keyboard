@@ -17,4 +17,12 @@ void save_all_data_to_fram(void)
     PRINT("GAP_APPEARE = %04x\n", data_in_fram.GAP_APPEARE);
 
     fram_write(0, &data_in_fram, sizeof(data_in_fram));
+    if (running_data.have_update_custom_data) {
+        save_key_bound_data();
+    }
+}
+void save_key_bound_data(void)
+{
+    EEPROM_ERASE(EEPROM_BLOCK_SIZE * 4 + 1024, sizeof(key_bund));
+    EEPROM_WRITE(EEPROM_BLOCK_SIZE * 4 + 1024, &key_bund, sizeof(key_bund));
 }
