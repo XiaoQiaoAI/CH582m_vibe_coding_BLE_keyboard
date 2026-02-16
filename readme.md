@@ -1,6 +1,6 @@
 # 功能介绍
 
-[键盘展示视频](https://space.bilibili.com/2001376117?spm_id_from=333.1007.0.0)
+[键盘展示视频]([https://space.bilibili.com/2001376117?spm_id_from=333.1007.0.0](https://www.bilibili.com/video/BV1C6ZMBgEcM/?spm_id_from=333.1387.0.0&vd_source=df25740f1d3732101203e58b2e2a6026))
 
 **为 Claude Code 打造的物理控制键盘 – 带实体按键、OLED 屏幕、RGB LED 和语音输入。完全开源，无限自定义。**
 
