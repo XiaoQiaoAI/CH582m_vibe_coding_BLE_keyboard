@@ -1,4 +1,7 @@
 # 功能介绍
+
+[键盘展示视频](https://space.bilibili.com/2001376117?spm_id_from=333.1007.0.0)
+
 **为 Claude Code 打造的物理控制键盘 – 带实体按键、OLED 屏幕、RGB LED 和语音输入。完全开源，无限自定义。**
 
 - **四个实体按键**
