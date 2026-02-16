@@ -1,4 +1,4 @@
-#功能介绍
+# 功能介绍
 **为 Claude Code 打造的物理控制键盘 – 带实体按键、OLED 屏幕、RGB LED 和语音输入。完全开源，无限自定义。**
 
 - **四个实体按键**
@@ -47,11 +47,11 @@ TCP接口 <-> claude hook程序, 上报claude状态 (Python开发, 脚本)
 1. 安装wchisp, 控制芯片进boot模式, 通过usb进行程序下载
 2. 暂时boot引脚还不方便手动搞
 
-###快速上手
+### 快速上手
 ### 1️⃣ 获取硬件
 两种方式：
 - **自己动手**：立创开源广场马上开源
-- **购买套件**：我们提供完整的 DIY 硬件包（PCB + 所有元件 + USB 线 + 亚克力外壳+键帽键轴），也提供开箱即用的完整版 – [claude外接自定义键盘](https://e.tb.cn/h.7Ceul3q1qmKK51M?tk=S6nIUnuIiBV)。
+- **购买套件**：我们提供完整的 DIY 硬件包（PCB + 所有元件 + USB 线 + 亚克力外壳+键帽键轴），也提供开箱即用的完整版 – [claude外接自定义键盘](https://e.tb.cn/h.7Ceul3q1qmKK51M?tk=S6nIUnuIiBV)。键盘开源讨论qq群（1082678922）
 
 ### 2️⃣ 烧录固件
 -下载软件 `WCHISP Studio`（烧录软件工具）
@@ -61,8 +61,11 @@ https://www.wch.cn/downloads/WCHISPTool_Setup_exe.html
 
 ### 3️⃣ 安装上位机工具
 运行install_hook.py 给claude code安装钩子，地址为[给claude装钩子](https://github.com/PtilopsisSak/BLE_tcp_bridge_for_vibe_code)
+
 语音输入我用的是[离线语音输入](https://github.com/HaujetZhao/CapsWriter-Offline)
+
 可以更改自定义上传动图的上位机软件链接：[上位机软件](https://github.com/XiaoQiaoAI/vibe_code_config_tool)
+
 键盘与电脑的桥接软件：[BLE_Bridge](https://github.com/XiaoQiaoAI/vibe_code_config_tool)
 更细致的使用流程马上编写（挖坑）
 
