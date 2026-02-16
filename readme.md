@@ -47,7 +47,7 @@ TCP接口 <-> claude hook程序, 上报claude状态 (Python开发, 脚本)
 1. 安装wchisp, 控制芯片进boot模式, 通过usb进行程序下载
 2. 暂时boot引脚还不方便手动搞
 
-### 快速上手
+# 快速上手
 
 ### 1️⃣ 获取硬件
 两种方式：
