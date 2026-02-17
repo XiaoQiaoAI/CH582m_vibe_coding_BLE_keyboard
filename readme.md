@@ -12,6 +12,8 @@
     
 - **拨杆开关** – 轻轻一拨，在**自动批准**和**手动模式**之间切换
 
+- **双模** - **type-C**连接和**蓝牙**连接两种方式，没电了type-C充电即可
+
 - **0.96英寸 OLED 屏幕**
   - 显示当前状态、可爱像素图，或者你上传的自定义图片、动图（动漫角色、表情包……）
   - 内置小游戏正在开发中
@@ -58,19 +60,19 @@ TCP接口 <-> claude hook程序, 上报claude状态 (Python开发, 脚本)
 - **购买套件**：我们提供完整的 DIY 硬件包（PCB + 所有元件 + USB 线 + 亚克力外壳+键帽键轴），也提供开箱即用的完整版 – [claude外接自定义键盘](https://e.tb.cn/h.7Ceul3q1qmKK51M?tk=S6nIUnuIiBV)。键盘开源讨论qq群（1082678922）
 
 ### 2️⃣ 烧录固件
--下载软件 `WCHISP Studio`（烧录软件工具）
-https://www.wch.cn/downloads/WCHISPTool_Setup_exe.html
+-下载软件 `WCHISP Studio`[烧录软件工具](https://www.wch.cn/downloads/WCHISPTool_Setup_exe.html)
 - 按住 `蓝色（语音）` 按钮的同时通过 Type-C连接开发板，下载。  
- 
+在
 
 ### 3️⃣ 安装上位机工具
-运行install_hook.py 给claude code安装钩子，地址为[给claude装钩子](https://github.com/PtilopsisSak/BLE_tcp_bridge_for_vibe_code)
+1、下载[给claude装钩子的包](https://github.com/XiaoQiaoAI/vibe_code_config_tool)，在文件夹里打开终端，运行install_hook.py，即python install_hook.py。
 
-语音输入我用的是[离线语音输入](https://github.com/HaujetZhao/CapsWriter-Offline)
+2、运行[键盘与电脑的桥接软件](https://github.com/XiaoQiaoAI/BLE_tcp_bridge_for_vibe_code)，
 
-可以更改自定义上传动图的上位机软件链接：[上位机软件](https://github.com/XiaoQiaoAI/vibe_code_config_tool)
+3、语音输入我用的是[离线语音输入](https://github.com/HaujetZhao/CapsWriter-Offline)，所以现在键盘的语音输入的hook封装的是Cap和鼠标侧键X2（一起按）
 
-键盘与电脑的桥接软件：[BLE_Bridge](https://github.com/XiaoQiaoAI/vibe_code_config_tool)
+4、可以轻松自定义修改（上传动图，更改键盘hook映射）的上位机软件链接：[上位机软件](https://github.com/XiaoQiaoAI/vibe_code_config_tool)
+
 更细致的使用流程马上编写（挖坑）
 
 ### 4️⃣ 开始自定义！
