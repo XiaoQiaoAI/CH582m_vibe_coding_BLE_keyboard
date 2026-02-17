@@ -59,7 +59,10 @@ TCP接口 <-> claude hook程序, 上报claude状态 (Python开发, 脚本)
 - **自己动手**：立创开源广场马上开源
 - **购买套件**：我们提供完整的 DIY 硬件包（PCB + 所有元件 + USB 线 + 亚克力外壳+键帽键轴），也提供开箱即用的完整版 – [claude外接自定义键盘](https://e.tb.cn/h.7Ceul3q1qmKK51M?tk=S6nIUnuIiBV)。键盘开源讨论qq群（1082678922）
 
-### 2️⃣ 烧录固件
+### 2️⃣ 获取固件，上位机等全套软件
+
+
+### 3️⃣ 烧录固件
 -下载软件 `WCHISP Studio`[烧录软件工具](https://www.wch.cn/downloads/WCHISPTool_Setup_exe.html)
 - 按住 `蓝色（语音）` 按钮的同时通过 Type-C连接开发板，下载。  
 在
