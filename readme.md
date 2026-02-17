@@ -59,7 +59,11 @@ TCP接口 <-> claude hook程序, 上报claude状态 (Python开发, 脚本)
 - **自己动手**：立创开源广场马上开源
 - **购买套件**：我们提供完整的 DIY 硬件包（PCB + 所有元件 + USB 线 + 亚克力外壳+键帽键轴），也提供开箱即用的完整版 – [claude外接自定义键盘](https://e.tb.cn/h.7Ceul3q1qmKK51M?tk=S6nIUnuIiBV)。键盘开源讨论qq群（1082678922）
 
-### 2️⃣ 获取固件，上位机等全套软件，教程
+### 2️⃣ 获取固件，上位机等全套封装好的软件，教程
 [点击下载最新版键盘固件包](https://github.com/XiaoQiaoAI/CH582m_vibe_coding_BLE_keyboard/releases/tag/v1.0)
 
+# 编辑整个工程，修改⚙️
 
+[键盘固件代码](https://github.com/XiaoQiaoAI/CH582m_vibe_coding_BLE_keyboard)
+[键盘与电脑的桥接软件](https://github.com/XiaoQiaoAI/BLE_tcp_bridge_for_vibe_code)
+[电脑上位机-钩子及自定义软件](https://github.com/XiaoQiaoAI/vibe_code_config_tool)
