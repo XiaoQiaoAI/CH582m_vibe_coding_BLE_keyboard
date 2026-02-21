@@ -131,6 +131,13 @@ void command_process(uint8_t *d, uint32_t len)
             running_data.data_address     = address;
             running_data.data_end_address = address + size;
             running_data.pic_writing      = 1;
+            LCD_CS_RESET;
+            IPS_Clear(BLACK);
+            IPS_ShowString(24, 24, "Uploading Pic...", GREEN);
+            char p[20];
+            sprintf(p, "%d,%d", sector / 7, sector);
+            IPS_ShowString(24, 40, p, GREEN);
+            LCD_CS_SET;
         }
     }
     if (d[0] == 0x82 && len == 8) { // pic information update
