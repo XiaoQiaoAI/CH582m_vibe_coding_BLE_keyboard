@@ -198,6 +198,7 @@ void sub_main(void)
     running_data.ws2812_mode             = WS2812_RAINBOW_WAVE_SLOW;
     running_data.ws2812_single_color     = 0x020a0ff;
     running_data.have_update_custom_data = 0;
+    running_data.claude_state            = CL_SessionEnd; // defaule CL_SessionEnd
 }
 tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
 {
@@ -403,7 +404,7 @@ void update_claude_ws2812(void)
         running_data.ws2812_single_color = 0xf02029;
     } break;
     case CL_SessionEnd: {
-        running_data.ws2812_mode = WS2812_RAINBOW_WAVE_SLOW;
+        running_data.ws2812_mode = WS2812_OFF;
     } break;
     }
     if (running_data.sw_state == 0) { // auto mode cover

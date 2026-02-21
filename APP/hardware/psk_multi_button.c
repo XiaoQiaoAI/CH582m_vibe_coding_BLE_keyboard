@@ -26,20 +26,14 @@ uint8_t num_of_keys(void)
     return sum;
 }
 
-void shutdown(void)
-{
-    keyboard_press_sp_key(LEFT_GUI, 2);
-    keyboard_press_char('x', 2);
-    keyboard_delay(100);
-    keyboard_press_sp_key(LEFT_GUI, 2);
-    keyboard_press_char('x', 2);
-    keyboard_delay(50);
-    keyboard_press_str("uuuuuuuuuuuuuuuuuuu\n", 5);
-}
 void set_mode(uint8_t mode)
 {
-    __LimitValue(mode, 0, 4);
-    running_data.mode_data = mode;
+    __LimitValue(mode, 0, 3);
+    // mode default 2812 mode
+    // mode 0 is override in key_power_callback, call func void update_claude_ws2812(void)
+    const enum ws2812_mode_e m[4] = {WS2812_OFF, WS2812_RAINBOW_MOVE, WS2812_RAINBOW_WAVE_SLOW, WS2812_OFF};
+    running_data.ws2812_mode      = m[mode];
+    running_data.mode_data        = mode;
     LCD_CS_RESET;
     IPS_Clear(CYAN);
     char txt[15];
@@ -155,6 +149,9 @@ void key_power_callback(void *button)
         running_data.edit_flag               = 0;
         running_data.ws2812_mode_ignore_flag = 0;
         tmos_set_event(mTaskID, MCT_PIC_DISPLAY);
+        if (running_data.mode_data == 0) {
+            update_claude_ws2812();
+        }
         break;
     }
     case LONG_PRESS_START: {
