@@ -37,17 +37,17 @@ const uint8_t exter_scan_data[] = {
     HI_UINT16(DEFAULT_DESIRED_MAX_CONN_INTERVAL),
 
     // service UUIDs
-    0x05, // length of this data
-    GAP_ADTYPE_16BIT_MORE,
-    LO_UINT16(HID_SERV_UUID),
-    HI_UINT16(HID_SERV_UUID),
-    LO_UINT16(BATT_SERV_UUID),
-    HI_UINT16(BATT_SERV_UUID),
+    // 0x05, // length of this data
+    // GAP_ADTYPE_16BIT_MORE,
+    // LO_UINT16(HID_SERV_UUID),
+    // HI_UINT16(HID_SERV_UUID),
+    // LO_UINT16(BATT_SERV_UUID),
+    // HI_UINT16(BATT_SERV_UUID),
 
     // Tx power level
-    0x02, // length of this data
-    GAP_ADTYPE_POWER_LEVEL,
-    0     // 0dBm
+    // 0x02, // length of this data
+    // GAP_ADTYPE_POWER_LEVEL,
+    // 0     // 0dBm
 };
 static uint8_t exter_advertData[] = {
     // flags
