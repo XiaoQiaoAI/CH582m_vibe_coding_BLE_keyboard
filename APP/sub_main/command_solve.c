@@ -166,7 +166,7 @@ void command_process(uint8_t *d, uint32_t len)
             ret[ret_len++]  = d[1];
             memcpy(ret + ret_len, (uint8_t *) (key_bund.pic[d[1]]), sizeof(key_bund.pic[0]));
             ret_len += sizeof(key_bund.pic[0]);
-            uint16_t max_pic_size = 73;
+            uint16_t max_pic_size = nor_flash_get_size() / 7 / 4096;
             memcpy(ret + ret_len, (uint8_t *) (&max_pic_size), sizeof(max_pic_size));
             ret_len += sizeof(max_pic_size);
             ret[ret_len++] = 0xcc;

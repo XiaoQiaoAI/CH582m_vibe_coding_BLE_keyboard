@@ -21,30 +21,41 @@
 //W25Q64  ID  0XEF16
 //W25Q128 ID  0XEF17
 //W25Q256 ID  0XEF18
-// #define W25Q80   0XEF13
-// #define W25Q16   0XEF14
-// #define W25Q32   0XEF15
-// #define W25Q64   0XEF16
-// #define W25Q128  0XEF17
-// #define W25Q256  0XEF18
+#define W25Q80  0XEF13
+#define W25Q16  0XEF14
+#define W25Q32  0XEF15
+#define W25Q64  0XEF16
+#define W25Q128 0XEF17
+#define W25Q256 0XEF18
 
-// now c8 is giga device
-// GD25 ser
-#define W25Q80   0XC813
-#define W25Q16   0XC814
-#define W25Q32   0XC815
-#define W25Q64   0XC816
-#define W25Q128  0XC817
-#define W25Q256  0XC818
+enum nor_flash_manu_e {
 
-#define NM25Q80  0X5213
-#define NM25Q16  0X5214
-#define NM25Q32  0X5215
-#define NM25Q64  0X5216
-#define NM25Q128 0X5217
-#define NM25Q256 0X5218
+    NOR_FLASH_Winbond    = 0xEF,
+    NOR_FLASH_MXIC       = 0xC2,
+    NOR_FLASH_GigaDevice = 0xC8, // 兆易创新
+    NOR_FLASH_micron     = 0x20, // 镁光
+    NOR_FLASH_PUYA       = 0x85, // PUYA(普冉)
+};
+enum nor_flash_size_e {
 
-extern uint16_t W25QXX_TYPE;                                //定义W25QXX芯片型号
+    NOR_SIZE_8M   = 0X13,
+    NOR_SIZE_16M  = 0X14,
+    NOR_SIZE_32M  = 0X15,
+    NOR_SIZE_64M  = 0X16,
+    NOR_SIZE_128M = 0X17,
+    NOR_SIZE_256M = 0X18,
+};
+#define NOR_FLASH_GET_MANUFACTURARID(x) (((x) &0x0FF00) >> 8)
+#define NOR_FLASH_GET_SIZEID(x)         (((x) &0x000FF))
+
+#define NM25Q80                         0X5213
+#define NM25Q16                         0X5214
+#define NM25Q32                         0X5215
+#define NM25Q64                         0X5216
+#define NM25Q128                        0X5217
+#define NM25Q256                        0X5218
+
+extern uint16_t nor_flash_id;                               //定义W25QXX芯片型号
 
 #define W25QXX_CS_H           GPIOB_SetBits(GPIO_Pin_12);   //W25QXX的片选信号
 #define W25QXX_CS_L           GPIOB_ResetBits(GPIO_Pin_12); //W25QXX的片选信号
@@ -91,5 +102,7 @@ void     W25QXX_PowerDown(void);                                                
 void     W25QXX_WAKEUP(void);                                                    //唤醒
 void     W25QXX_Read_start(u32 ReadAddr);
 void     W25QXX_Read_end(void);
+char    *nor_flash_get_manufacturary_name(void);
+uint32_t nor_flash_get_size(void);
 
 #endif

@@ -13,7 +13,7 @@
 //All rights reserved
 //////////////////////////////////////////////////////////////////////////////////
 
-uint16_t W25QXX_TYPE = W25Q256; //默认是W25Q256
+uint16_t nor_flash_id = W25Q256; //默认是W25Q256
 
 void SPI2_WriteByte(uint8_t d)
 {
@@ -46,10 +46,10 @@ void W25QXX_Init(void)
     W25QXX_CS_H; //SPI FLASH不选中
     // SPI2_Init();                                      //初始化SPI
     // SPI2_SetSpeed(SPI_BAUDRATEPRESCALER_2);           //设置为42M时钟,高速模式
-    W25QXX_TYPE = W25QXX_ReadID();                //读取FLASH ID.
-    if (W25QXX_TYPE == W25Q256)                   //SPI FLASH为W25Q256
+    nor_flash_id = W25QXX_ReadID();                          //读取FLASH ID.
+    if (NOR_FLASH_GET_SIZEID(nor_flash_id) == NOR_SIZE_256M) //SPI FLASH为W25Q256
     {
-        temp = W25QXX_ReadSR(3);                  //读取状态寄存器3，判断地址模式
+        temp = W25QXX_ReadSR(3);                             //读取状态寄存器3，判断地址模式
         if ((temp & 0X01) == 0)                   //如果不是4字节地址模式,则进入4字节地址模式
         {
             W25QXX_CS_L;                          //选中
@@ -168,9 +168,9 @@ uint16_t W25QXX_ReadID(void)
 void W25QXX_Read(uint8_t *pBuffer, u32 ReadAddr, uint16_t NumByteToRead)
 {
     uint16_t i;
-    W25QXX_CS_L;                   //使能器件
-    SPI2_WriteByte(W25X_ReadData); //发送读取命令
-    if (W25QXX_TYPE == W25Q256)    //如果是W25Q256的话地址为4字节的，要发送最高8位
+    W25QXX_CS_L;                                             //使能器件
+    SPI2_WriteByte(W25X_ReadData);                           //发送读取命令
+    if (NOR_FLASH_GET_SIZEID(nor_flash_id) == NOR_SIZE_256M) //如果是W25Q256的话地址为4字节的，要发送最高8位
     {
         SPI2_WriteByte((uint8_t) ((ReadAddr) >> 24));
     }
@@ -185,9 +185,9 @@ void W25QXX_Read(uint8_t *pBuffer, u32 ReadAddr, uint16_t NumByteToRead)
 void W25QXX_Read_start(u32 ReadAddr)
 {
     uint16_t i;
-    W25QXX_CS_L;                   //使能器件
-    SPI2_WriteByte(W25X_ReadData); //发送读取命令
-    if (W25QXX_TYPE == W25Q256)    //如果是W25Q256的话地址为4字节的，要发送最高8位
+    W25QXX_CS_L;                                             //使能器件
+    SPI2_WriteByte(W25X_ReadData);                           //发送读取命令
+    if (NOR_FLASH_GET_SIZEID(nor_flash_id) == NOR_SIZE_256M) //如果是W25Q256的话地址为4字节的，要发送最高8位
     {
         SPI2_WriteByte((uint8_t) ((ReadAddr) >> 24));
     }
@@ -212,10 +212,10 @@ void W25QXX_Read_end(void)
 void W25QXX_Write_Page(uint8_t *pBuffer, u32 WriteAddr, uint16_t NumByteToWrite)
 {
     uint16_t i;
-    W25QXX_Write_Enable();            //SET WEL
-    W25QXX_CS_L;                      //使能器件
-    SPI2_WriteByte(W25X_PageProgram); //发送写页命令
-    if (W25QXX_TYPE == W25Q256)       //如果是W25Q256的话地址为4字节的，要发送最高8位
+    W25QXX_Write_Enable();                                   //SET WEL
+    W25QXX_CS_L;                                             //使能器件
+    SPI2_WriteByte(W25X_PageProgram);                        //发送写页命令
+    if (NOR_FLASH_GET_SIZEID(nor_flash_id) == NOR_SIZE_256M) //如果是W25Q256的话地址为4字节的，要发送最高8位
     {
         SPI2_WriteByte((uint8_t) ((WriteAddr) >> 24));
     }
@@ -334,11 +334,11 @@ void W25QXX_Erase_Sector(u32 Dst_Addr)
     //监视falsh擦除情况,测试用
     //printf("fe:%x\r\n",Dst_Addr);
     Dst_Addr *= 4096;
-    W25QXX_Write_Enable();            //SET WEL
+    W25QXX_Write_Enable();                                   //SET WEL
     W25QXX_Wait_Busy();
-    W25QXX_CS_L;                      //使能器件
-    SPI2_WriteByte(W25X_SectorErase); //发送扇区擦除指令
-    if (W25QXX_TYPE == W25Q256)       //如果是W25Q256的话地址为4字节的，要发送最高8位
+    W25QXX_CS_L;                                             //使能器件
+    SPI2_WriteByte(W25X_SectorErase);                        //发送扇区擦除指令
+    if (NOR_FLASH_GET_SIZEID(nor_flash_id) == NOR_SIZE_256M) //如果是W25Q256的话地址为4字节的，要发送最高8位
     {
         SPI2_WriteByte((uint8_t) ((Dst_Addr) >> 24));
     }
@@ -369,4 +369,38 @@ void W25QXX_WAKEUP(void)
     SPI2_WriteByte(W25X_ReleasePowerDown); //  send W25X_PowerDown command 0xAB
     W25QXX_CS_H;                           //取消片选
     DelayUs(3);                            //等待TRES1
+}
+char *nor_flash_get_manufacturary_name(void)
+{
+    switch (NOR_FLASH_GET_MANUFACTURARID(nor_flash_id)) {
+    case NOR_FLASH_GigaDevice:
+        return "GigaDevices";
+    case NOR_FLASH_micron:
+        return "micron";
+    case NOR_FLASH_MXIC:
+        return "MXIC";
+    case NOR_FLASH_PUYA:
+        return "PUYA";
+    default:
+        return NULL;
+    }
+}
+uint32_t nor_flash_get_size(void)
+{
+    switch (NOR_FLASH_GET_SIZEID(nor_flash_id)) {
+    case NOR_SIZE_8M:
+        return 8 / 8 * 1024 * 1024;
+    case NOR_SIZE_16M:
+        return 16 / 8 * 1024 * 1024;
+    case NOR_SIZE_32M:
+        return 32 / 8 * 1024 * 1024;
+    case NOR_SIZE_64M:
+        return 64 / 8 * 1024 * 1024;
+    case NOR_SIZE_128M:
+        return 128 / 8 * 1024 * 1024;
+    case NOR_SIZE_256M:
+        return 256 / 8 * 1024 * 1024;
+    default:
+        return 0;
+    }
 }

@@ -192,7 +192,17 @@ void sub_main(void)
     LCD_CS_SET;
     // ! GD25Q256 2 --------------------------------------------------------------------
     W25QXX_Init();
-    PRINT("id %x\n", W25QXX_TYPE);
+    {
+        char *p = nor_flash_get_manufacturary_name();
+        if (p) {
+            PRINT("flash %s\n", p);
+        } else {
+            PRINT("unknown flash %02x\n", NOR_FLASH_GET_MANUFACTURARID(nor_flash_id));
+        }
+        uint32_t size = nor_flash_get_size();
+        PRINT("flash size %d Mbytes\n", size / 1024 / 1024);
+        PRINT("max_pic_size %d\n", nor_flash_get_size() / 7 / 4096);
+    }
 
     tmos_start_task(mTaskID, MCT_PIC_DISPLAY, MS1_TO_SYSTEM_TIME(100));
     running_data.ws2812_mode             = WS2812_RAINBOW_WAVE_SLOW;
