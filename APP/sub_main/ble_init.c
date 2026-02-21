@@ -23,7 +23,7 @@ uint32_t Fram_Write_Flash(uint32_t addr, uint32_t num, uint32_t *pBuf)
 }
 
 const uint8_t ble_name[][21] = {
-    {0xE3, 0x83, 0x9B, 0xE3, 0x82, 0xB7, 0xE3, 0x83, 0x8E, '6'}, // ¥Û¥·¥Î
+    {'v', 'i', 'b', 'e', 0x20, 'c', 'o', 'd', 'e'}, // vibe code
 };
 
 #define APPEARANCE GAP_APPEARE_HID_DIGITIZER_TYABLET
