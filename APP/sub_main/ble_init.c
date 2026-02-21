@@ -37,12 +37,12 @@ const uint8_t exter_scan_data[] = {
     HI_UINT16(DEFAULT_DESIRED_MAX_CONN_INTERVAL),
 
     // service UUIDs
-    // 0x05, // length of this data
-    // GAP_ADTYPE_16BIT_MORE,
-    // LO_UINT16(HID_SERV_UUID),
-    // HI_UINT16(HID_SERV_UUID),
-    // LO_UINT16(BATT_SERV_UUID),
-    // HI_UINT16(BATT_SERV_UUID),
+    0x05, // length of this data
+    GAP_ADTYPE_16BIT_MORE,
+    LO_UINT16(HID_SERV_UUID),
+    HI_UINT16(HID_SERV_UUID),
+    LO_UINT16(BATT_SERV_UUID),
+    HI_UINT16(BATT_SERV_UUID),
 
     // Tx power level
     // 0x02, // length of this data
@@ -75,8 +75,8 @@ uint8_t        scanRspData__[MAX_SCAN_RES_LEN];
 uint16_t       scanRspData__len;
 uint8_t        advertData__[MAX_SCAN_RES_LEN];
 uint16_t       advertData__len;
-// #define NAME_IN_ADV
-#define NAME_IN_SCAN
+#define NAME_IN_ADV
+// #define NAME_IN_SCAN
 extern uint32_t g_LLE_IRQLibHandlerLocation;
 void            PSK_WCHBLE_Init(void)
 {
@@ -122,7 +122,7 @@ void            PSK_WCHBLE_Init(void)
 #endif
             memcpy(scanRspData__ + i,
                    exter_scan_data,
-                   min(MAX_SCAN_RES_LEN - sizeof(exter_scan_data), MAX_SCAN_RES_LEN - i));
+                   min(min(MAX_SCAN_RES_LEN - sizeof(exter_scan_data), MAX_SCAN_RES_LEN - i), sizeof(exter_scan_data)));
             scanRspData__len = i + sizeof(exter_scan_data);
             // PRINT("scan LEN%d \n", scanRspData__len);
         }
