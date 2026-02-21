@@ -70,6 +70,8 @@ Two options:
 - [Keyboard-computer bridge software](https://github.com/XiaoQiaoAI/BLE_tcp_bridge_for_vibe_code)
 - [Computer host software - Hook and customization tool](https://github.com/XiaoQiaoAI/vibe_code_config_tool)
 
+GIF author [x: @downvote_me](https://x.com/downvote_me)
+
 ---
 
 ## 中文
@@ -135,3 +137,5 @@ TCP接口 <-> claude hook程序, 上报claude状态 (Python开发, 脚本)
 [键盘固件代码](https://github.com/XiaoQiaoAI/CH582m_vibe_coding_BLE_keyboard)
 [键盘与电脑的桥接软件](https://github.com/XiaoQiaoAI/BLE_tcp_bridge_for_vibe_code)
 [电脑上位机-钩子及自定义软件](https://github.com/XiaoQiaoAI/vibe_code_config_tool)
+
+展示里面的动图作者:[x: @downvote_me](https://x.com/downvote_me)
