@@ -12,7 +12,7 @@ const uint8_t report_map_all[105] = {
     0xa1,
     0x01, // COLLECTION (Application)
     0x85,
-    1,    // Report ID (8)
+    1, // Report ID (8)
     0x05,
     0x07, //   USAGE_PAGE (Keyboard)
     0x19,
@@ -30,9 +30,9 @@ const uint8_t report_map_all[105] = {
     0x81,
     0x02, //   INPUT (Data,Var,Abs)
     0x95,
-    1,    //   REPORT_COUNT (1)
+    1, //   REPORT_COUNT (1)
     0x75,
-    8,    //   REPORT_SIZE (8)
+    8, //   REPORT_SIZE (8)
     0x81,
     0x03, //   INPUT (Cnst,Var,Abs)
 
@@ -78,7 +78,7 @@ const uint8_t report_map_all[105] = {
     0x19,
     0x00, //   Usage Minimum (0),
     0x29,
-    101,  //   Usage Maximum (101),
+    101, //   Usage Maximum (101),
     0x81,
     0x02, //   Input (Data, Variable, Absolute),
 
@@ -482,7 +482,7 @@ void MY_USB_HID_SEND_REPORT(uint8_t *report, uint16_t len)
             // if (*report == 0x01)
             // u2dev_update_report(report + 1, len - 1);
             // PRINT("USB\n");
-            usb_EP1_send_report(report, len);
+            // usb_EP1_send_report(report, len);
         }
     }
 #ifdef USING_CUSTOM_HID
