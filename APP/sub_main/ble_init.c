@@ -2,6 +2,7 @@
 #include "config.h"
 #include "main.h"
 #include "math.h"
+#include "stdio.h"
 
 extern uint32_t Lib_Read_Flash(uint32_t addr, uint32_t num, uint32_t *pBuf);
 extern uint32_t Lib_Write_Flash(uint32_t addr, uint32_t num, uint32_t *pBuf);
@@ -22,14 +23,14 @@ uint32_t Fram_Write_Flash(uint32_t addr, uint32_t num, uint32_t *pBuf)
     return 0;
 }
 
-const uint8_t ble_name[][21] = {
-    {'v', 'i', 'b', 'e', 0x20, 'c', 'o', 'd', 'e'}, // vibe code
+uint8_t ble_name[][21] = {
+    {'v', 'i', 'b', 'e', 0x20, 'c', 'o', 'd', 'e', 0x20, ',', ',', ',', ','}, // vibe code
 };
 
 #define APPEARANCE GAP_APPEARE_HID_DIGITIZER_TYABLET
 // #define APPEARANCE 0x03C7
 const uint8_t exter_scan_data[] = {
-    0x05,                                         // length of this data
+    0x05, // length of this data
     GAP_ADTYPE_SLAVE_CONN_INTERVAL_RANGE,
     LO_UINT16(DEFAULT_DESIRED_MIN_CONN_INTERVAL), // 100ms
     HI_UINT16(DEFAULT_DESIRED_MIN_CONN_INTERVAL),
@@ -81,6 +82,13 @@ extern uint32_t g_LLE_IRQLibHandlerLocation;
 void            PSK_WCHBLE_Init(void)
 {
     uint8_t *name_point = NULL;
+    {
+        uint8_t localMacAddr[6];
+        char    txt[5];
+        GetMACAddress(localMacAddr);
+        sprintf(txt, "%02X%02X", localMacAddr[1], localMacAddr[0]);
+        memcpy((ble_name[0]) + 10, txt, 4);
+    }
     if (data_in_fram.GAP_APPEARE) {
         exter_advertData[5] = LO_UINT16(data_in_fram.GAP_APPEARE);
         exter_advertData[6] = HI_UINT16(data_in_fram.GAP_APPEARE);
@@ -194,7 +202,7 @@ void            PSK_WCHBLE_Init(void)
 #if (defined TEM_SAMPLE) && (TEM_SAMPLE == TRUE)
     cfg.tsCB = HAL_GetInterTempValue; // 根据温度变化校准RF和内部RC( 大于7摄氏度 )
 #if (CLK_OSC32K)
-    cfg.rcCB = Lib_Calibration_LSI;   // 内部32K时钟校准
+    cfg.rcCB = Lib_Calibration_LSI; // 内部32K时钟校准
 #endif
 #endif
 #if (defined(HAL_SLEEP)) && (HAL_SLEEP == TRUE)
