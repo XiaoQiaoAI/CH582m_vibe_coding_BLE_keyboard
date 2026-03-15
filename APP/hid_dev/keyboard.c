@@ -194,6 +194,23 @@ void add_key_code(uint8_t k, int8_t reprot_times)
         if (k == 0) {
             return;
         }
+        // do a sort before delete or add key
+        int t = 0;
+        for (int i = 0; i < 6; i++) {
+            t = i;
+
+            if (tkeyboard_buff.keys_release_times[i] == 0) {
+                *(tkeyboard_buff.keys + i) = 0;
+            } else {
+            }
+            while (t > 0 && tkeyboard_buff.keys_release_times[t - 1] == 0 && tkeyboard_buff.keys_release_times[t] != 0) {
+                tkeyboard_buff.keys_release_times[t - 1] = tkeyboard_buff.keys_release_times[t];
+                *(tkeyboard_buff.keys + t - 1)           = *(tkeyboard_buff.keys + t);
+                tkeyboard_buff.keys_release_times[t]     = 0;
+                *(tkeyboard_buff.keys + t)               = 0;
+                t--;
+            }
+        }
 
         for (i = 0; i < 6; i++) {
             if (*(tkeyboard_buff.keys + i) == k) {
