@@ -139,6 +139,28 @@ TCP接口 <-> claude hook程序, 上报claude状态 (Python开发, 脚本)
 展示里面的动图作者:[x: @downvote_me](https://x.com/downvote_me)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 非商业用途开源许可协议 (Non-Commercial Open Source License)
 
 版权所有 (c) [2026] [南京市锦心湾科技有限责任公司]
