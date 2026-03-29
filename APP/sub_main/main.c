@@ -205,7 +205,7 @@ void sub_main(void)
     }
 
     tmos_start_task(mTaskID, MCT_PIC_DISPLAY, MS1_TO_SYSTEM_TIME(100));
-    running_data.ws2812_mode             = WS2812_RAINBOW_WAVE_SLOW;
+    running_data.ws2812_mode             = WS2812_OFF;
     running_data.ws2812_single_color     = 0x020a0ff;
     running_data.have_update_custom_data = 0;
     running_data.claude_state            = CL_SessionEnd; // defaule CL_SessionEnd
@@ -310,8 +310,30 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
     }
     if (events & MCT_WS2812_MODE) {
         tmos_start_task(mTaskID, MCT_WS2812_MODE, MS1_TO_SYSTEM_TIME(50));
-        if (running_data.ws2812_mode_ignore_flag == 0) {
-            ws2812_display(running_data.ws2812_mode, running_data.ws2812_single_color);
+        static uint8_t last_bt_stat = 1;
+        static int8_t  prograss     = 0;
+        if (last_bt_stat != running_data.bt_connect_stat && running_data.bt_connect_stat != 0) {
+            last_bt_stat = running_data.bt_connect_stat;
+            if (last_bt_stat == 2)
+                prograss = 1;
+            else if (last_bt_stat == 1)
+                prograss = 19;
+        }
+        if (prograss <= 0 || prograss >= 20) {
+            if (running_data.ws2812_mode_ignore_flag == 0) {
+                ws2812_display(running_data.ws2812_mode, running_data.ws2812_single_color);
+            }
+        } else {
+            if (last_bt_stat == 2)
+                prograss++;
+            else
+                prograss--;
+            for (int i = 0; i < LED_NUM; i++) {
+                if (i > prograss / 2)
+                    ws2812_list[i].hex = 0;
+                else
+                    ws2812_list[i].hex = 0xf030e6; // #f030e6
+            }
         }
         for (int i = 0; i < LED_NUM; i++)
             update_bit(i);
