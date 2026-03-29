@@ -60,7 +60,7 @@ TCP interface <-> Claude hook program (reports Claude status, Python script)
 #### 1️⃣ Get the Hardware
 Two options:
 - **DIY**: Will be open sourced on Lichuang Open Source Plaza soon
-- **Purchase a kit**: We provide complete DIY hardware packages (PCB + all components + USB cable + acrylic case + keycaps and switches), as well as ready-to-use versions – [Claude external custom keyboard](https://e.tb.cn/h.7Ceul3q1qmKK51M?tk=S6nIUnuIiBV). Join the keyboard open source discussion QQ group: 1082678922
+- **Purchase a kit**: We provide complete DIY hardware packages (PCB + all components + USB cable + acrylic case + keycaps and switches), as well as ready-to-use versions，Tell the customer service the password "Github Developer" to claim a large discount coupon. – [Claude external custom keyboard](https://e.tb.cn/h.7Ceul3q1qmKK51M?tk=S6nIUnuIiBV). Join the keyboard open source discussion QQ group: 1082678922
 
 #### 2️⃣ Get Firmware, Host Software, and Full Tutorials
 [Click to download the latest keyboard firmware package](https://github.com/XiaoQiaoAI/CH582m_vibe_coding_BLE_keyboard/releases/tag/v1.0)
@@ -128,7 +128,7 @@ TCP接口 <-> claude hook程序, 上报claude状态 (Python开发, 脚本)
 #### 1️⃣ 获取硬件
 两种方式：
 - **自己动手**：板子的原理图在hard_ware里。
-- **购买套件**：我们提供完整的 DIY 硬件包（PCB + 所有元件 + USB 线 + 亚克力外壳+键帽键轴），也提供开箱即用的完整版 – [claude外接自定义键盘](https://e.tb.cn/h.7Ceul3q1qmKK51M?tk=S6nIUnuIiBV)。键盘开源讨论qq群（1082678922）
+- **购买套件**：我们提供完整的 DIY 硬件包（PCB + 所有元件 + USB 线 + 亚克力外壳+键帽键轴），也提供开箱即用的完整版，告诉客服口令“Github开发者”，领取大额优惠券 – [claude外接自定义键盘](https://e.tb.cn/h.7Ceul3q1qmKK51M?tk=S6nIUnuIiBV)。键盘开源讨论qq群（1082678922）
 
 #### 2️⃣ 获取固件，上位机等全套封装好的软件，教程
 [点击下载最新版键盘固件包](https://github.com/XiaoQiaoAI/CH582m_vibe_coding_BLE_keyboard/releases/tag/v1.0)
