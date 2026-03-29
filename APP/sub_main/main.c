@@ -130,9 +130,9 @@ void sub_main(void)
     LL_GPIO_SetOutputPin(GPIOA, GPIO_Pin_12);
     GPIO_SINGLE_INIT(GPIOA, GPIO_Pin_12, GPIO_ModeOut_PP_5mA);
     // ! buzz --------------------------------------------------------------------
-    buzzerDriverInit();
-    buzzerSetNewFrequency(0);
-    tmos_start_task(mTaskID, MCT_music_ticks, MS1_TO_SYSTEM_TIME(20));
+    // buzzerDriverInit();
+    // buzzerSetNewFrequency(0);
+    // tmos_start_task(mTaskID, MCT_music_ticks, MS1_TO_SYSTEM_TIME(20));
     // start_music(0);
     // ! SW --------------------------------------------------------------------
     GPIOB_ModeCfg(GPIO_Pin_5, GPIO_ModeOut_PP_5mA);
@@ -170,7 +170,7 @@ void sub_main(void)
     // ! ips --------------------------------------------------------------------
     GPIOB_SetBits(GPIO_Pin_17); // cs
     GPIOB_ModeCfg(GPIO_Pin_17, GPIO_ModeOut_PP_5mA);
-    GPIOB_SetBits(GPIO_Pin_9);  // RST
+    GPIOB_SetBits(GPIO_Pin_9); // RST
     GPIOB_ModeCfg(GPIO_Pin_9, GPIO_ModeOut_PP_5mA);
     GPIOB_SetBits(GPIO_Pin_16); // RST
     GPIOB_ModeCfg(GPIO_Pin_16, GPIO_ModeOut_PP_5mA);
