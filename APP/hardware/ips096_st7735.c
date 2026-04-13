@@ -251,7 +251,7 @@ void IPS_DrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t c
     int      incx, incy, uRow, uCol;
     delta_x = x2 - x1; // 计算坐标增量
     delta_y = y2 - y1;
-    uRow    = x1;      // 画线起点坐标
+    uRow    = x1; // 画线起点坐标
     uCol    = y1;
     if (delta_x > 0)
         incx = 1; // 设置单步方向
@@ -330,15 +330,14 @@ void IPS_ShowChar(uint16_t x, uint16_t y, uint8_t num, uint8_t mode, uint16_t co
 void IPS_ShowString(uint16_t x, uint16_t y, const uint8_t *p, uint16_t color)
 {
     while (*p != '\0') {
-        // if (x > IPS_W - 16)
-        // {
-        // 	x = 0;
-        // 	y += 16;
-        // }
-        if (y > IPS_H - 16) {
-            y = x = 0;
-            IPS_Clear(RED);
+        if (x > IPS_W - 16) {
+            x = 0;
+            y += 16;
         }
+        // if (y > IPS_H - 16) {
+        //     y = x = 0;
+        //     IPS_Clear(RED);
+        // }
         IPS_ShowChar(x, y, *p, 0, color);
         x += 8;
         p++;
