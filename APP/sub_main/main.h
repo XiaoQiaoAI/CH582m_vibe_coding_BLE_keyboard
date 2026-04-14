@@ -20,6 +20,7 @@ enum my_event_name_e {
     MCT_COMMAND_TODO         = (1 << 11),
     MCT_DATA_TODO            = (1 << 12),
     MCT_PIC_DISPLAY          = (1 << 13),
+    MCT_MODE_END             = (1 << 14),
 
     MCT_NO_USE = (1 << 15),
 };
@@ -72,7 +73,7 @@ typedef struct
     uint8_t tmp_mac;
     int     v_bat;
     uint8_t power_persent;
-    uint8_t bt_connect_stat;             // 0 no 1 connecting 2 ed
+    uint8_t bt_connect_stat; // 0 no 1 connecting 2 ed
 
     uint8_t            usb_is_connected; // 0 ble, 1 usb
     enum ws2812_mode_e ws2812_mode;

@@ -418,6 +418,15 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
         }
         return events ^ MCT_PIC_DISPLAY;
     }
+    if (events & MCT_MODE_END) {
+        running_data.edit_flag               = 0;
+        running_data.ws2812_mode_ignore_flag = 0;
+        tmos_set_event(mTaskID, MCT_PIC_DISPLAY);
+        if (running_data.mode_data == 0) {
+            update_claude_ws2812();
+        }
+        return events ^ MCT_MODE_END;
+    }
 
     return 0;
 }

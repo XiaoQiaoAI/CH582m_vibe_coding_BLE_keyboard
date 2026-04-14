@@ -145,28 +145,31 @@ void key_power_callback(void *button)
     index         = ((struct Button *) button)->func_para;
     switch (btn_event_val) {
     case PRESS_DOWN: {
-        running_data.edit_flag               = 1;
-        running_data.have_edit               = 0;
-        running_data.ws2812_mode_ignore_flag = 1;
-        for (int i = 0; i < LED_NUM; i++) {
-            ws2812_list[i].hex = 0;
-        }
-        set_mode(running_data.mode_data);
         break;
     }
     case PRESS_UP: {
-        running_data.edit_flag               = 0;
-        running_data.ws2812_mode_ignore_flag = 0;
-        tmos_set_event(mTaskID, MCT_PIC_DISPLAY);
-        if (running_data.mode_data == 0) {
-            update_claude_ws2812();
+        break;
+    }
+    case SINGLE_CLICK: {
+        if (1) {
+            running_data.edit_flag = 1;
+            running_data.mode_data += 1;
+            running_data.mode_data %= 4;
+            running_data.have_edit               = 1;
+            running_data.ws2812_mode_ignore_flag = 1;
+            for (int i = 0; i < LED_NUM; i++) {
+                ws2812_list[i].hex = 0;
+            }
+            set_mode(running_data.mode_data);
+            tmos_start_task(mTaskID, MCT_MODE_END, MS1_TO_SYSTEM_TIME(1500));
+        } else {
         }
         break;
     }
     case LONG_PRESS_START: {
-        if (running_data.have_edit == 0) {
-            tmos_set_event(mTaskID, MCT_START_POWER_OFF);
-        }
+        // if (running_data.have_edit == 0) {
+        tmos_set_event(mTaskID, MCT_START_POWER_OFF);
+        // }
         break;
     }
     }
@@ -184,6 +187,7 @@ void my_button_init(void)
             button_attach(keys__uz + i, PRESS_DOWN, key_power_callback);
             button_attach(keys__uz + i, PRESS_UP, key_power_callback);
             button_attach(keys__uz + i, LONG_PRESS_START, key_power_callback);
+            button_attach(keys__uz + i, SINGLE_CLICK, key_power_callback);
         }
         button_start(keys__uz + i);
     }
