@@ -207,7 +207,31 @@ void sub_main(void)
         PRINT("flash size %d Mbytes\n", size / 1024 / 1024);
         PRINT("max_pic_size %d\n", nor_flash_get_size() / 7 / 4096);
     }
-
+    uint32_t tmp = 0;
+    EEPROM_READ(EEPROM_BLOCK_SIZE * 4 + 1024, &tmp, sizeof(tmp));
+    if (tmp == 0xFFFFFFFF) {
+        for (int i = 0; i < ARRAY_SIZE(pic_dp); i++) {
+            for (int j = i * 7; j < i * 7 + 7; j++) {
+                uint16_t sector = j;
+                PRINT("size %d, address %p, se %d\n", 4096, sector * 4096, sector);
+                W25QXX_Erase_Sector(sector);
+            }
+            uint32_t add    = i * 4096 * 7;
+            uint32_t remain = 25600;
+            uint32_t send   = 0;
+            while (remain > 0) {
+                int len = remain > 1024 ? 1024 : remain;
+                W25QXX_Write_NoCheck(&(pic_dp[i][send]), add, len);
+                add += len;
+                send += len;
+                remain -= len;
+            }
+        }
+        key_bund.pic[0][0] = 0;
+        key_bund.pic[0][1] = ARRAY_SIZE(pic_dp);
+        key_bund.pic[0][2] = 100;
+        save_key_bound_data();
+    }
     tmos_start_task(mTaskID, MCT_PIC_DISPLAY, MS1_TO_SYSTEM_TIME(100));
     running_data.ws2812_mode             = WS2812_OFF;
     running_data.ws2812_single_color     = 0x020a0ff;
