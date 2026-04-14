@@ -372,3 +372,20 @@ void IPS_ShowString_len(uint16_t x, uint16_t y, const uint8_t *p, uint16_t color
 //		IPS_Write_Datauint8_t(gImage_img[i * 2]);
 //	}
 // }
+
+void IPS_show_single_color_pic(
+    uint8_t *d, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t forecolor, uint16_t backcolor)
+{
+    IPS_Addr_Set(x, y, x + w-1, y + h-1);
+    int st = 0;
+    for (int i = y; i < y + h; i++) {
+        for (int j = 0; j < w; j++) {
+            uint8_t mask = 0x80 >> (j % 8);
+            if (d[st + j / 8] & mask) {
+                IPS_Write_Datauint16_t(forecolor);
+            } else
+                IPS_Write_Datauint16_t(backcolor);
+        }
+        st += (w - 1) / 8 + 1;
+    }
+}

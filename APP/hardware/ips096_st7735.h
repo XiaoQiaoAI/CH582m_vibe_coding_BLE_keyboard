@@ -80,5 +80,7 @@ void IPS_ShowString(uint16_t x, uint16_t y, const uint8_t *p, uint16_t color);
 // void IPS_ShowPicture(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 void IPS_Addr_Set(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
 void IPS_Write_Datauint8_t(uint8_t data);
+void IPS_show_single_color_pic(
+    uint8_t *d, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t forecolor, uint16_t backcolor);
 
 #endif
