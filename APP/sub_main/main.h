@@ -85,6 +85,8 @@ typedef struct
     uint8_t  pic_index;
     uint8_t  pic_writing;
 
+    uint8_t charge_flag;
+
     uint8_t             sw_state;
     enum claude_state_e claude_state;
     uint8_t             have_update_custom_data;
@@ -115,6 +117,8 @@ extern key_bund_s key_bund;
 
 void start_music(int x);
 void power_deep_sleep(void);
+
+#define IS_CHAEGING !GPIOA_ReadPortPin(GPIO_Pin_13)
 
 // *notes; //
 extern running_data_s running_data;

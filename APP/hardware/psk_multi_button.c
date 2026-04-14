@@ -37,8 +37,17 @@ void set_mode(uint8_t mode)
     LCD_CS_RESET;
     IPS_Clear(CYAN);
     char txt[15];
-    sprintf(txt, "%1d.%02dV %d%%", running_data.v_bat / 100, running_data.v_bat % 100, running_data.power_persent);
+    sprintf(txt,
+            "%1d.%02dV %d%% %c",
+            running_data.v_bat / 100,
+            running_data.v_bat % 100,
+            running_data.power_persent,
+            IS_CHAEGING ? 'C' : ' ');
+    BACK_COLOR = IS_CHAEGING ? GREEN : CYAN;
     IPS_ShowString(8, 0, txt, MAGENTA);
+    BACK_COLOR = CYAN;
+    sprintf(txt, "%s", running_data.bt_connect_stat == 2 ? "OK" : "ing");
+    IPS_ShowString(152 - 8 * strlen(txt), 0, txt, MAGENTA);
     for (int i = 0; i < LED_NUM; i++) {
         ws2812_list[i].hex = 0;
     }

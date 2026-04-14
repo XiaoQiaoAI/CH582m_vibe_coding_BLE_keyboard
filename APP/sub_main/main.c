@@ -1,5 +1,7 @@
 #include "main.h"
 #include "command_solve.h"
+#include "img_cgr.h"
+#include "pic.h"
 #include "w25qxx.h"
 
 const uint8_t  usb_name[]   = {0x4B, 0x6D, 0xD5, 0x8B};
@@ -76,7 +78,9 @@ void sub_main_1(void)
     // --------------------------------------------------------------------
     GPIOA_SetBits(GPIO_Pin_13);
     GPIOA_ModeCfg(GPIO_Pin_13, GPIO_ModeIN_PU);
-#define IS_CHAEGING !GPIOA_ReadPortPin(GPIO_Pin_13)
+    GPIOA_ITModeCfg(GPIO_Pin_13, GPIO_ITMode_FallEdge);
+    PFIC_EnableIRQ(GPIO_A_IRQn);
+    running_data.charge_flag = IS_CHAEGING;
     // ! usb_detect
     // --------------------------------------------------------------------
     GPIOA_SetBits(GPIO_Pin_14);
@@ -370,6 +374,15 @@ tmosEvents MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events)
         return events ^ MCT_DATA_TODO;
     }
     if (events & MCT_PIC_DISPLAY) {
+        if (running_data.charge_flag) {
+            running_data.charge_flag = 0;
+            LCD_CS_RESET;
+            IPS_Clear(BLACK);
+            IPS_show_single_color_pic(gImage_cgr, 36, 11, 88, 58, GREEN, BLACK);
+            LCD_CS_SET;
+            tmos_start_task(mTaskID, MCT_PIC_DISPLAY, MS1_TO_SYSTEM_TIME(1000));
+            return events ^ MCT_PIC_DISPLAY;
+        }
         if (running_data.pic_writing) {
             return events ^ MCT_PIC_DISPLAY;
         }
@@ -451,4 +464,13 @@ void update_claude_ws2812(void)
         } break;
         }
     }
+}
+__INTERRUPT
+__HIGH_CODE
+void GPIOA_IRQHandler(void)
+{
+    GPIOA_ClearITFlagBit(GPIO_Pin_13);
+    PRINT("cgr\n");
+    running_data.charge_flag = 1;
+    tmos_start_task(mTaskID, MCT_PIC_DISPLAY, MS1_TO_SYSTEM_TIME(0));
 }
