@@ -10,7 +10,7 @@ data_in_fram_s data_in_fram = {0};
 running_data_s running_data;
 
 tmosEvents    MCT_ProcessEvent(tmosTaskID task_id, tmosEvents events);
-const uint8_t defult_key_0_0[] = {0x73, 1, HID_KEYBOARD_CAPS_LOCK};
+const uint8_t defult_key_0_0[] = {0x73, 1, 0x6d};
 const uint8_t defult_key_0_1[] = {0x73, 1, HID_KEYBOARD_RETURN};
 const uint8_t defult_key_0_2[] = {0x74,
                                   12,

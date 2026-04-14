@@ -432,10 +432,10 @@ const uint8_t report_map_six_key[63] = {
     0x95, 0x06, // Report Count (6)
     0x75, 0x08, // Report Size (8)
     0x15, 0x00, // Log Min (0)
-    0x25, 0x65, // Log Max (101)
+    0x25, 0x6d, // Log Max (101)
     0x05, 0x07, // Usage Pg (Key Codes)
     0x19, 0x00, // Usage Min (0)
-    0x29, 0x65, // Usage Max (101)
+    0x29, 0x6d, // Usage Max (101)
     0x81, 0x00, // Input: (Data, Array)
                 //
     0xC0        // End Collection
